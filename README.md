@@ -1,2 +1,2 @@
-# openshift-openstack-ci
-Code base for openshift ci using openstack resources
+# openshift-cluster-pool
+Code base for openshift cluster pool
