@@ -1,0 +1,21 @@
+
+{
+    "Name": "minishift-simple",
+    "description": "minishift-simple",
+    "size": 2,
+    "max_size": 2,
+    "unused-cluster-timeout": 1,
+    "used-cluster-timeout": 1,
+    "parallel-provisioning": 1,
+    "parallel-de-provisioning": 1,
+    "provision-command": "minishift-simple-provision.sh",
+    "de-provision-command": "minishift-simple-deprovision.sh",
+    "force-deprovision-command": "minishift-simple-deprovision.sh",
+    "cluster-url-command": "minishift-simple-cluster-url.sh",
+    "cluster-admin-user-command": "echo 'developer'",
+    "cluster-admin-password-command": "echo 'developer'",
+    "cluster-ca-file-command": "echo ''",
+    "cluster-cert-file-command": "echo ''",
+    "cluster-key-file-command": "echo ''",
+    "cluster-extra-info-command": "echo ''"
+}
