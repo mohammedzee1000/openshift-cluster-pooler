@@ -24,7 +24,7 @@ func (pm PoolManager) Run()  {
 	//Initialize
 	c, err := pm.context.NewEtcdConnection()
 	if err != nil {
-		log.Fatal("unable to connect to etcd : ", err.Error())
+		log.Fatal("unable to connect to database : ", err.Error())
 	}
 	_ = c.Close()
 	for {

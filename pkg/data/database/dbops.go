@@ -1,4 +1,4 @@
-package etcd
+package database
 
 import (
 	"context"
@@ -8,7 +8,7 @@ import (
 	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/config"
 )
 
-// TODO make it retry for etcd stuff
+// TODO make it retry for database stuff
 
 func handleError(err error)  {
 		if err != nil {
@@ -20,13 +20,13 @@ func handleError(err error)  {
 			case rpctypes.ErrEmptyKey:
 				log.Fatalf("client-side error: %v", err)
 			default:
-				log.Fatalf("bad clusters endpoints, which are not etcd servers: %v", err)
+				log.Fatalf("bad clusters endpoints, which are not database servers: %v", err)
 			}
 		}
 }
 
-//SaveinEtcd saved specified key value pair in etcd
-func SaveInEtcd(ctx *config.Context, key string, data string) {
+//SaveinKVDB saved specified key value pair in database
+func SaveinKVDB(ctx *config.Context, key string, data string) {
 	cli, err := ctx.NewEtcdConnection()
 	if err != nil {
 		handleError(err)
@@ -38,8 +38,8 @@ func SaveInEtcd(ctx *config.Context, key string, data string) {
 	}
 }
 
-//GetMultipleWithPrefixFromEtcd gets multiple values whose keys match specified prefix in etcd
-func GetMultipleWithPrefixFromEtcd(ctx *config.Context, keyprefix string) []string {
+//GetMultipleWithPrefixFromKVDB gets multiple values whose keys match specified prefix in database
+func GetMultipleWithPrefixFromKVDB(ctx *config.Context, keyprefix string) []string {
 	var values []string
 	cli, err := ctx.NewEtcdConnection()
 	if err != nil {
@@ -56,8 +56,8 @@ func GetMultipleWithPrefixFromEtcd(ctx *config.Context, keyprefix string) []stri
 	return values
 }
 
-//GetExactFromEtcd gets specific value which matches exact string
-func GetExactFromEtcd(ctx *config.Context, key string) string {
+//GetExactFromKVDB gets specific value which matches exact string
+func GetExactFromKVDB(ctx *config.Context, key string) string {
 	var value string
 	cli, err := ctx.NewEtcdConnection()
 	if err != nil {
@@ -74,7 +74,7 @@ func GetExactFromEtcd(ctx *config.Context, key string) string {
 	return value
 }
 
-//DeleteInEtcd deletes the key specified in etcd
+//DeleteInEtcd deletes the key specified in database
 func DeleteInEtcd(ctx *config.Context, key string)  {
 	cli, err := ctx.NewEtcdConnection()
 	if err != nil {

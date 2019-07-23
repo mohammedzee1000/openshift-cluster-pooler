@@ -62,7 +62,7 @@ func (c Context) NewEtcdConnection() (*clientv3.Client ,error) {
 //		case rpctypes.ErrEmptyKey:
 //			log.Fatalf("client-side error: %v", err)
 //		default:
-//			log.Fatalf("bad clusters endpoints, which are not etcd servers: %v", err)
+//			log.Fatalf("bad clusters endpoints, which are not database servers: %v", err)
 //		}
 //		return "", err
 //	}

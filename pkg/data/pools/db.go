@@ -5,33 +5,33 @@ import (
 	"errors"
 	"fmt"
 	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/config"
-	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/data/etcd"
+	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/data/database"
 )
 
 func getPoolKey(name string) string {
 	return fmt.Sprintf("%s-%s", Pool_Key, name)
 }
 
-//Save Saves the pool into etcd
+//Save Saves the pool into database
 func (p Pool) Save(ctx *config.Context) error  {
 	val, err := json.Marshal(p)
 	if err != nil {
 		return errors.New("failed to marshal clusters struct")
 	}
-	etcd.SaveInEtcd(ctx, getPoolKey(p.Name), string(val))
+	database.SaveinKVDB(ctx, getPoolKey(p.Name), string(val))
 	return nil
 }
 
-//Delete deletes the pool from etcd
+//Delete deletes the pool from database
 func (p Pool) Delete(ctx *config.Context) {
-	etcd.DeleteInEtcd(ctx, getPoolKey(p.Name))
+	database.DeleteInEtcd(ctx, getPoolKey(p.Name))
 }
 
-//List gets all pools in etcd
+//List gets all pools in database
 func List(ctx *config.Context) ([]Pool, error)  {
 	var pools []Pool
 	var err error
-	d := etcd.GetMultipleWithPrefixFromEtcd(ctx, Pool_Key)
+	d := database.GetMultipleWithPrefixFromKVDB(ctx, Pool_Key)
 	for _, item := range d {
 		var p Pool
 		err = json.Unmarshal([]byte(item), &p)
@@ -46,7 +46,7 @@ func List(ctx *config.Context) ([]Pool, error)  {
 //PoolByName gets a pool of specified name
 func PoolByName(ctx *config.Context, name string) (*Pool, error)  {
 	var p Pool
-	val := etcd.GetExactFromEtcd(ctx, getPoolKey(name))
+	val := database.GetExactFromKVDB(ctx, getPoolKey(name))
 	err := json.Unmarshal([]byte(val), &p)
 	if err != nil {
 		return nil, err

@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/config"
-	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/data/etcd"
+	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/data/database"
 )
 
 func getClusterPoolKey(poolname string) string {
@@ -16,26 +16,26 @@ func getClusterKey(clusterid string, poolname string) string {
 	return fmt.Sprintf("%s-%s-%s", Cluster_Prefix, poolname, clusterid)
 }
 
-//Save saves clusters information in etcd
+//Save saves clusters information in database
 func (c Cluster) Save(ctx *config.Context) error {
 	val, err := json.Marshal(c)
 	if err != nil {
 		return errors.New("failed to marshal clusters struct")
 	}
-	etcd.SaveInEtcd(ctx, getClusterKey(c.ClusterID, c.PoolName), string(val))
+	database.SaveinKVDB(ctx, getClusterKey(c.ClusterID, c.PoolName), string(val))
 	return nil
 }
 
-//Delete deletes clusters information from etcd
+//Delete deletes clusters information from database
 func (c Cluster) Delete(ctx *config.Context)  {
-	etcd.DeleteInEtcd(ctx, getClusterKey(c.ClusterID, c.PoolName))
+	database.DeleteInEtcd(ctx, getClusterKey(c.ClusterID, c.PoolName))
 }
 
-//List gets all the clusters in etcd
+//List gets all the clusters in database
 func List(ctx *config.Context) ([]Cluster, error)  {
 	var clusters []Cluster
 	var err error
-	d := etcd.GetMultipleWithPrefixFromEtcd(ctx, Cluster_Prefix)
+	d := database.GetMultipleWithPrefixFromKVDB(ctx, Cluster_Prefix)
 	for _, item := range d {
 		var cl Cluster
 		err = json.Unmarshal([]byte(item), &cl)
@@ -51,7 +51,7 @@ func List(ctx *config.Context) ([]Cluster, error)  {
 func ClustersInPool(ctx *config.Context, poolName string) ([]Cluster,error) {
 	var clusters []Cluster
 	var err error
-	d := etcd.GetMultipleWithPrefixFromEtcd(ctx, getClusterPoolKey(poolName))
+	d := database.GetMultipleWithPrefixFromKVDB(ctx, getClusterPoolKey(poolName))
 	for _, item := range d {
 		var cl Cluster
 		err = json.Unmarshal([]byte(item), &cl)
@@ -66,7 +66,7 @@ func ClustersInPool(ctx *config.Context, poolName string) ([]Cluster,error) {
 //ClusterByID gets a clusters in a pool with specified ID
 func ClusterByID(ctx *config.Context, poolName string, clusterid string) (*Cluster, error) {
 	var cluster Cluster
-	val := etcd.GetExactFromEtcd(ctx, getClusterKey(clusterid, poolName))
+	val := database.GetExactFromKVDB(ctx, getClusterKey(clusterid, poolName))
 	err := json.Unmarshal([]byte(val), &cluster)
 	if err != nil {
 		return nil, err
