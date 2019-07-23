@@ -5,7 +5,7 @@ Code base for openshift cluster pool
 
 ### Prepare
 
-1. Make sure you have latest golang, docker and etcdctl the cli for etcd installed
+1. Make sure you have latest golang setup with support for go mod.
 
 1. Make sure you have minishift installed (https://docs.okd.io/latest/minishift/getting-started/index.html)
 
@@ -14,17 +14,38 @@ Code base for openshift cluster pool
 $ git clone mohammedzee1000/openshift-cluster-pool && cd openshift-cluster-pool
 ```
 
-### Setup and run
+**Note:** You may need to setup requirements in go.mod appropriately before proceeding
+
+### Setup DB
+
+Build db-cli
+
+```
+go build cmd/test-db-cli/main/db-cli.go
+```
+
+Make a test DB directory
+```
+mkdir `pwd`/test-badger
+```
+
+**Warning:** `db-cli` is a quick and dirty cli built to overcome missing cli for badger db.
+It has limited function and should not be considered as replacement for the admin cli
+which is in the pipeline
+
+### Copy minishift provision scripts
+
+Add minishift pool config example to db
+
+```
+BADGER_DIR="`pwd`/test-badger" ./db-cli `pwd`/openshift-cluster-pooler/pool-examples/minishift-simple/minishift-simple.json
+```
+
+### Run pool manager
 
 Copy scripts to /usr/bin/
 ```
 $ cp -avrf pool-examples/minishift-simple/usr/bin/* /usr/bin/
-```
-
-Start etcd server
-
-```
-$ sudo docker run -d -p 2379:2379 -p 4001:4001 quay.io/coreos/etcd:latest etcd --advertise-client-urls http://0.0.0.0:2379 --listen-client-urls http://0.0.0.0:2379,http://0.0.0.0:4001
 ```
 
 Build pool manager
@@ -33,14 +54,9 @@ Build pool manager
 $ go build cmd/pool-manager/main/pool-manager.go
 ```
 
-Load minishift pool to db
-
-```
-$ echo pool-examples/minishift-simple/minishift-simple.json | etcdctl put Pool-minishift-simple
-```
 
 Start pool manager
 
 ```
-$ ETCD_ENDPOINTS="http://0.0.0.0:2379" ./pool-manager
+BADGER_DIR="`pwd`/test-badger" ./pool-manager
 ```

@@ -8,7 +8,7 @@ import (
 	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/data/database"
 )
 
-func getPoolKey(name string) string {
+func GetPoolKey(name string) string {
 	return fmt.Sprintf("%s-%s", Pool_Key, name)
 }
 
@@ -18,13 +18,13 @@ func (p Pool) Save(ctx *config.Context) error  {
 	if err != nil {
 		return errors.New("failed to marshal clusters struct")
 	}
-	database.SaveinKVDB(ctx, getPoolKey(p.Name), string(val))
+	database.SaveinKVDB(ctx, GetPoolKey(p.Name), string(val))
 	return nil
 }
 
 //Delete deletes the pool from database
 func (p Pool) Delete(ctx *config.Context) {
-	database.DeleteInEtcd(ctx, getPoolKey(p.Name))
+	database.DeleteInKVDB(ctx, GetPoolKey(p.Name))
 }
 
 //List gets all pools in database
@@ -46,7 +46,7 @@ func List(ctx *config.Context) ([]Pool, error)  {
 //PoolByName gets a pool of specified name
 func PoolByName(ctx *config.Context, name string) (*Pool, error)  {
 	var p Pool
-	val := database.GetExactFromKVDB(ctx, getPoolKey(name))
+	val := database.GetExactFromKVDB(ctx, GetPoolKey(name))
 	err := json.Unmarshal([]byte(val), &p)
 	if err != nil {
 		return nil, err

@@ -22,7 +22,8 @@ func NewPoolManager() *PoolManager {
 
 func (pm PoolManager) Run()  {
 	//Initialize
-	c, err := pm.context.NewEtcdConnection()
+	c, err := pm.context.NewBadgerConnection()
+
 	if err != nil {
 		log.Fatal("unable to connect to database : ", err.Error())
 	}

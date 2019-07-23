@@ -1,88 +1,87 @@
 package database
 
 import (
-	"context"
-	"github.com/etcd-io/etcd/etcdserver/api/v3rpc/rpctypes"
-	"log"
-	"github.com/etcd-io/etcd/clientv3"
+	"github.com/dgraph-io/badger"
 	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/config"
+	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/logging"
 )
 
 // TODO make it retry for database stuff
 
-func handleError(err error)  {
+func HandleError(err error)  {
 		if err != nil {
-			switch err {
-			case context.Canceled:
-				log.Fatalf("ctx is canceled by another routine: %v", err)
-			case context.DeadlineExceeded:
-				log.Fatalf("ctx is attached with a deadline is exceeded: %v", err)
-			case rpctypes.ErrEmptyKey:
-				log.Fatalf("client-side error: %v", err)
-			default:
-				log.Fatalf("bad clusters endpoints, which are not database servers: %v", err)
-			}
+			logging.Fatal("Database Ops", "failed to connect to data source : %s", err.Error())
 		}
 }
 
 //SaveinKVDB saved specified key value pair in database
 func SaveinKVDB(ctx *config.Context, key string, data string) {
-	cli, err := ctx.NewEtcdConnection()
+	db, err := ctx.NewBadgerConnection()
 	if err != nil {
-		handleError(err)
+		HandleError(err)
 	}
-	defer cli.Close()
-	_, err = clientv3.NewKV(cli).Put(config.NewCliContext(), key, data)
-	if err != nil {
-		handleError(err)
-	}
+	defer db.Close()
+	err = db.Update(func(txn *badger.Txn) error {
+		return txn.Set([]byte(key), []byte(data))
+	})
+	HandleError(err)
 }
 
 //GetMultipleWithPrefixFromKVDB gets multiple values whose keys match specified prefix in database
 func GetMultipleWithPrefixFromKVDB(ctx *config.Context, keyprefix string) []string {
 	var values []string
-	cli, err := ctx.NewEtcdConnection()
+	db, err := ctx.NewBadgerConnection()
 	if err != nil {
-		handleError(err)
+		HandleError(err)
 	}
-	defer cli.Close()
-	resp, err := clientv3.NewKV(cli).Get(config.NewCliContext(), keyprefix, clientv3.WithPrefix())
-	if err != nil {
-		handleError(err)
-	}
-	for _, item := range resp.Kvs {
-		values = append(values, string(item.Value))
-	}
+	defer db.Close()
+	err = db.View(func(txn *badger.Txn) error {
+		it := txn.NewIterator(badger.DefaultIteratorOptions)
+		defer it.Close()
+		prefix := []byte(keyprefix)
+		for it.Seek(prefix); it.ValidForPrefix(prefix); it.Next() {
+			item := it.Item()
+			err := item.Value(func(v []byte) error {
+				values = append(values, string(v))
+				return nil
+			})
+			if err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+	HandleError(err)
 	return values
 }
 
 //GetExactFromKVDB gets specific value which matches exact string
 func GetExactFromKVDB(ctx *config.Context, key string) string {
 	var value string
-	cli, err := ctx.NewEtcdConnection()
-	if err != nil {
-		handleError(err)
-	}
-	defer cli.Close()
-	resp, err := clientv3.NewKV(cli).Get(config.NewCliContext(), key)
-	if err != nil {
-		handleError(err)
-	}
-	if len(resp.Kvs) > 0 {
-		value = string(resp.Kvs[0].Value)
-	}
+	db, err := ctx.NewBadgerConnection()
+	HandleError(err)
+	defer db.Close()
+	err = db.View(func(txn *badger.Txn) error {
+		item, err := txn.Get([]byte(key))
+		if err != nil {
+			return err
+		}
+		return item.Value(func(val []byte) error {
+			value = string(val)
+			return nil
+		})
+	})
+	HandleError(err)
 	return value
 }
 
-//DeleteInEtcd deletes the key specified in database
-func DeleteInEtcd(ctx *config.Context, key string)  {
-	cli, err := ctx.NewEtcdConnection()
-	if err != nil {
-		handleError(err)
-	}
-	defer cli.Close()
-	_, err = clientv3.NewKV(cli).Delete(config.NewCliContext(), key)
-	if err != nil {
-		handleError(err)
-	}
+//DeleteInKVDB deletes the key specified in database
+func DeleteInKVDB(ctx *config.Context, key string)  {
+	db, err := ctx.NewBadgerConnection()
+	HandleError(err)
+	defer db.Close()
+	err = db.Update(func(txn *badger.Txn) error {
+		return txn.Delete([]byte(key))
+	})
+	HandleError(err)
 }

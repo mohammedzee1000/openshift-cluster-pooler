@@ -1,3 +1,9 @@
+# Editor
 .idea
-default.etcd
+
+# Build results
 pool-manager
+db-cli
+
+# test files
+test-badger
