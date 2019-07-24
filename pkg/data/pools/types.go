@@ -2,7 +2,7 @@ package pools
 
 const Pool_Key  = "Pool"
 
-//Pool repersents config of a pool
+//Pool repersents generic of a pool
 type Pool struct {
 	Name                        string `json:"name"`
 	Description                 string `json:"description"`

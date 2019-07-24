@@ -3,7 +3,7 @@ package pools
 import (
 	"encoding/json"
 	"github.com/dgraph-io/badger"
-	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/config"
+	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/generic"
 	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/data/database"
 	"github.com/pkg/errors"
 
@@ -12,12 +12,12 @@ import (
 
 //Activates a cluster, if it is available. This is the only direct db func
 // in pool as we need to ensure cluster activation is a transaction
-func (p Pool) Activate(ctx *config.Context) (*clusters.Cluster, error)  {
+func (p Pool) Activate(ctx *generic.Context) (*clusters.Cluster, error)  {
 	var c clusters.Cluster
 	var found bool
 	db, err := ctx.NewBadgerConnection()
 	if err != nil {
-		database.HandleError(err)
+		database.HandleError(ctx, err)
 	}
 	defer db.Close()
 	// cluster activation transaction
@@ -62,6 +62,6 @@ func (p Pool) Activate(ctx *config.Context) (*clusters.Cluster, error)  {
 	if !found {
 		return nil, errors.New("could not get a cluster to activae")
 	}
-	database.HandleError(err)
+	database.HandleError(ctx, err)
 	return &c, nil
 }

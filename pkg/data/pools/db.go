@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/config"
+	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/generic"
 	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/data/database"
 )
 
@@ -13,7 +13,7 @@ func GetPoolKey(name string) string {
 }
 
 //Save Saves the pool into database
-func (p Pool) Save(ctx *config.Context) error  {
+func (p Pool) Save(ctx *generic.Context) error  {
 	val, err := json.Marshal(p)
 	if err != nil {
 		return errors.New("failed to marshal clusters struct")
@@ -23,12 +23,12 @@ func (p Pool) Save(ctx *config.Context) error  {
 }
 
 //Delete deletes the pool from database
-func (p Pool) Delete(ctx *config.Context) {
+func (p Pool) Delete(ctx *generic.Context) {
 	database.DeleteInKVDB(ctx, GetPoolKey(p.Name))
 }
 
 //List gets all pools in database
-func List(ctx *config.Context) ([]Pool, error)  {
+func List(ctx *generic.Context) ([]Pool, error)  {
 	var pools []Pool
 	var err error
 	d := database.GetMultipleWithPrefixFromKVDB(ctx, Pool_Key)
@@ -44,7 +44,7 @@ func List(ctx *config.Context) ([]Pool, error)  {
 }
 
 //PoolByName gets a pool of specified name
-func PoolByName(ctx *config.Context, name string) (*Pool, error)  {
+func PoolByName(ctx *generic.Context, name string) (*Pool, error)  {
 	var p Pool
 	val := database.GetExactFromKVDB(ctx, GetPoolKey(name))
 	err := json.Unmarshal([]byte(val), &p)

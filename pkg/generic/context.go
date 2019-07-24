@@ -1,4 +1,4 @@
-package config
+package generic
 
 import (
 	"context"
@@ -12,8 +12,10 @@ type Context struct {
 }
 
 type internalContext struct {
+	Name          string
 	LogsDir       string
 	BadgerDir     string
+	Log           *LogHander
 }
 
 func NewCliContext() context.Context {
@@ -21,15 +23,15 @@ func NewCliContext() context.Context {
 	return c
 }
 
-func NewContext() (Context, error) {
-	ctx := Context{&internalContext{}}
+func NewContext(name string) (*Context, error) {
+	ctx := Context{&internalContext{Log: NewLogger(name), Name: name}}
 	ctx.LogsDir = "/var/log/openshift-clusters-pools"
 	ctx.BadgerDir = "/var/openshift-cluster-pools/badger"
 	badgerenv := os.Getenv("BADGER_DIR")
 	if len(badgerenv) > 0 {
 		ctx.BadgerDir = badgerenv
 	}
-	return ctx, nil
+	return &ctx, nil
 }
 
 

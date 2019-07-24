@@ -2,37 +2,36 @@ package database
 
 import (
 	"github.com/dgraph-io/badger"
-	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/config"
-	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/logging"
+	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/generic"
 )
 
 // TODO make it retry for database stuff
 
-func HandleError(err error)  {
+func HandleError(ctx *generic.Context, err error)  {
 		if err != nil {
-			logging.Fatal("Database Ops", "failed to connect to data source : %s", err.Error())
+			ctx.Log.Fatal("Database Ops", err, "failed to connect to data source")
 		}
 }
 
 //SaveinKVDB saved specified key value pair in database
-func SaveinKVDB(ctx *config.Context, key string, data string) {
+func SaveinKVDB(ctx *generic.Context, key string, data string) {
 	db, err := ctx.NewBadgerConnection()
 	if err != nil {
-		HandleError(err)
+		HandleError(ctx, err)
 	}
 	defer db.Close()
 	err = db.Update(func(txn *badger.Txn) error {
 		return txn.Set([]byte(key), []byte(data))
 	})
-	HandleError(err)
+	HandleError(ctx, err)
 }
 
 //GetMultipleWithPrefixFromKVDB gets multiple values whose keys match specified prefix in database
-func GetMultipleWithPrefixFromKVDB(ctx *config.Context, keyprefix string) []string {
+func GetMultipleWithPrefixFromKVDB(ctx *generic.Context, keyprefix string) []string {
 	var values []string
 	db, err := ctx.NewBadgerConnection()
 	if err != nil {
-		HandleError(err)
+		HandleError(ctx, err)
 	}
 	defer db.Close()
 	err = db.View(func(txn *badger.Txn) error {
@@ -51,15 +50,15 @@ func GetMultipleWithPrefixFromKVDB(ctx *config.Context, keyprefix string) []stri
 		}
 		return nil
 	})
-	HandleError(err)
+	HandleError(ctx, err)
 	return values
 }
 
 //GetExactFromKVDB gets specific value which matches exact string
-func GetExactFromKVDB(ctx *config.Context, key string) string {
+func GetExactFromKVDB(ctx *generic.Context, key string) string {
 	var value string
 	db, err := ctx.NewBadgerConnection()
-	HandleError(err)
+	HandleError(ctx, err)
 	defer db.Close()
 	err = db.View(func(txn *badger.Txn) error {
 		item, err := txn.Get([]byte(key))
@@ -71,17 +70,17 @@ func GetExactFromKVDB(ctx *config.Context, key string) string {
 			return nil
 		})
 	})
-	HandleError(err)
+	HandleError(ctx, err)
 	return value
 }
 
 //DeleteInKVDB deletes the key specified in database
-func DeleteInKVDB(ctx *config.Context, key string)  {
+func DeleteInKVDB(ctx *generic.Context, key string)  {
 	db, err := ctx.NewBadgerConnection()
-	HandleError(err)
+	HandleError(ctx, err)
 	defer db.Close()
 	err = db.Update(func(txn *badger.Txn) error {
 		return txn.Delete([]byte(key))
 	})
-	HandleError(err)
+	HandleError(ctx, err)
 }

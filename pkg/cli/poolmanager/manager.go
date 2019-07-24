@@ -1,23 +1,22 @@
 package poolmanager
 
 import (
-	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/config"
+	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/generic"
 	pools2 "github.com/mohammedzee1000/openshift-cluster-pool/pkg/data/pools"
-	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/logging"
-	"github.com/prometheus/common/log"
 	"time"
+	"log"
 )
 
 type PoolManager struct {
-	context *config.Context
+	context *generic.Context
 }
 
 func NewPoolManager() *PoolManager {
-	ctx, err := config.NewContext()
+	ctx, err := generic.NewContext("pool-manager")
 	if err != nil {
-		log.Fatal("unable to initialize context")
+		log.Fatal("Pool Manager", err, "unable to initialize context")
 	}
-	return &PoolManager{context: &ctx}
+	return &PoolManager{context: ctx}
 }
 
 func (pm PoolManager) Run()  {
@@ -25,13 +24,13 @@ func (pm PoolManager) Run()  {
 	c, err := pm.context.NewBadgerConnection()
 
 	if err != nil {
-		log.Fatal("unable to connect to database : ", err.Error())
+		pm.context.Log.Fatal("Pool Manager", err, "unable to connect to database")
 	}
 	_ = c.Close()
 	for {
 		pools, err := pools2.List(pm.context)
 		if err != nil {
-			logging.Fatal("Pool Manager","failed to retrieve pool list : ", err.Error())
+			pm.context.Log.Fatal("Pool Manager", err, "failed to retrieve pool list")
 		}
 		if len(pools) > 0 {
 			for _, item := range pools{
@@ -40,7 +39,7 @@ func (pm PoolManager) Run()  {
 				time.Sleep(1 * time.Minute)
 			}
 		} else {
-			logging.Info("Pool Manager", "no pools, skipping this turn")
+			pm.context.Log.Info("Pool Manager", "no pools, skipping this turn")
 		}
 		time.Sleep(2 * time.Minute)
 	}

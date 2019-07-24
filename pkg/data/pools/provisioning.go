@@ -3,9 +3,8 @@ package pools
 import (
 	"fmt"
 	"github.com/google/uuid"
-	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/config"
+	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/generic"
 	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/data/clusters"
-	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/logging"
 	"strings"
 	"time"
 )
@@ -67,8 +66,8 @@ func (p Pool) stripeol(c *clusters.Cluster)  {
 }
 
 //provision provisions a clusters using provided command.
-func (p Pool) provision(ctx *config.Context) error {
-	logging.Info("Pool provision", fmt.Sprintf("provisioning clusters of pool %s", p.Name))
+func (p Pool) provision(ctx *generic.Context) error {
+	ctx.Log.Info("Pool provision", fmt.Sprintf("provisioning clusters of pool %s", p.Name))
 	clusterid := uuid.New().String()
 	c := clusters.NewCluster(clusterid, p.Name)
 	_ = c.Save(ctx)
@@ -76,24 +75,24 @@ func (p Pool) provision(ctx *config.Context) error {
 	if err != nil {
 		c.State = clusters.State_Failed
 		_ = c.Save(ctx)
-		logging.Error("Pool provision", "failed provision of clusters of pool %s: %s", p.Name, err.Error())
+		ctx.Log.Error("Pool provision", err, "failed provision of clusters of pool %s", p.Name)
 		return err
 	}
 	err = p.gatherInfoOnSuccess(c)
 	if err != nil {
 		c.State = clusters.State_Failed
 		_ = c.Save(ctx)
-		logging.Error("Pool provision", "failed to provision cluster %s, pool %s", c.ClusterID, p.Name)
+		ctx.Log.Error("Pool provision", err,"failed to provision cluster %s, pool %s", c.ClusterID, p.Name)
 		return err
 	}
 	_ = c.Save(ctx)
-	logging.Info("Pool provision", "successfully provisioned clusters %s, pool %s", c.ClusterID, p.Name)
+	ctx.Log.Info("Pool provision", "successfully provisioned clusters %s, pool %s", c.ClusterID, p.Name)
 	return nil
 }
 
 //deprovision destroys clusters resources using uuid and command
-func (p Pool) deprovision(ctx *config.Context, clusterid string, force bool) error {
-	logging.Info("Pool deprovision", "deprovisioning clusters of pool %s", p.Name)
+func (p Pool) deprovision(ctx *generic.Context, clusterid string, force bool) error {
+	ctx.Log.Info("Pool deprovision", "deprovisioning clusters of pool %s", p.Name)
 	var cmd string
 	if !force {
 		cmd = p.DeProvisionCommand
@@ -108,13 +107,13 @@ func (p Pool) deprovision(ctx *config.Context, clusterid string, force bool) err
 	_ = c.Save(ctx)
 	_, err = runCommand(clusterid, cmd)
 	if err != nil {
-		logging.Error("Pool deprovision", "failed to deprovision cluster %s, pool %s", c.ClusterID, p.Name)
+		ctx.Log.Error("Pool deprovision", err,"failed to deprovision cluster %s, pool %s", c.ClusterID, p.Name)
 		c.State = clusters.State_Failed
 		_ = c.Save(ctx)
 		return err
 	}
 	c.Delete(ctx)
-	logging.Info("Pool deprovision", "successfully deprovisioned clusters %s, pool %s", c.ClusterID, p.Name)
+	ctx.Log.Info("Pool deprovision", "successfully deprovisioned clusters %s, pool %s", c.ClusterID, p.Name)
 	return nil
 }
 

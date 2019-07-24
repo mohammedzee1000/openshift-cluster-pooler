@@ -4,18 +4,17 @@ import (
 	"errors"
 	"fmt"
 	"sync"
-	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/config"
+	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/generic"
 	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/data/clusters"
-	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/logging"
 	"time"
 )
 
 
-func (p Pool) gcCollect(ctx *config.Context, componentSubName string,gcclusters []clusters.Cluster) error  {
+func (p Pool) gcCollect(ctx *generic.Context, componentSubName string,gcclusters []clusters.Cluster) error  {
 	var err error
 	componentName := fmt.Sprintf("Pool GC - %s", componentSubName)
 	if len(gcclusters) <= 0 {
-		logging.Info(componentName, "no garbage in pool %s, skipping", p.Name)
+		ctx.Log.Info(componentName, "no garbage in pool %s, skipping", p.Name)
 		return nil
 	}
 	// Delete clusterlist as needed
@@ -27,10 +26,10 @@ func (p Pool) gcCollect(ctx *config.Context, componentSubName string,gcclusters 
 				if len(p.ForceDeprovisionCommand) > 0 {
 					err = p.deprovision(ctx, c.ClusterID, true)
 					if err != nil {
-						logging.Error(componentName, "Failed to force deprovision cluster : %s", err.Error())
+						ctx.Log.Error(componentName, err, "Failed to force deprovision cluster")
 					}
 				} else {
-					logging.Error(componentName, "Failed to deprovision cluster : %s", err.Error())
+					ctx.Log.Error(componentName, err, "Failed to deprovision cluster")
 				}
 			}
 		}
@@ -79,7 +78,7 @@ func (p Pool) gcCollect(ctx *config.Context, componentSubName string,gcclusters 
 	return nil
 }
 
-func (p Pool) gcByCondition(ctx *config.Context) error  {
+func (p Pool) gcByCondition(ctx *generic.Context) error  {
 	var gcclusters []clusters.Cluster
 	clusterlist, err := clusters.ClustersInPool(ctx, p.Name)
 	if err != nil {
@@ -108,7 +107,7 @@ func (p Pool) gcByCondition(ctx *config.Context) error  {
 	return p.gcCollect(ctx, "By Condition",gcclusters)
 }
 
-func (p Pool) gcByConfigChange(ctx *config.Context) error {
+func (p Pool) gcByConfigChange(ctx *generic.Context) error {
 	clusterlist, err := clusters.ClustersInPool(ctx, p.Name)
 	if err != nil {
 		return err
@@ -128,12 +127,12 @@ func (p Pool) gcByConfigChange(ctx *config.Context) error {
 }
 
 //GC deprovisions clusters that have failed or outlived a timeout
-func (p Pool) GC(ctx *config.Context) error  {
-	logging.Info("Pool GC", "initiating GC of pool %s", p.Name)
+func (p Pool) GC(ctx *generic.Context) error  {
+	ctx.Log.Info("Pool GC", "initiating GC of pool %s", p.Name)
 	//Fetch all clusterlist
-	logging.Info("Pool GC", "initiating cleanup of clusters that have met some conditions, pool %s", p.Name)
+	ctx.Log.Info("Pool GC", "initiating cleanup of clusters that have met some conditions, pool %s", p.Name)
 	_ = p.gcByCondition(ctx)
-	logging.Info("Pool GC", "initiating cleanup of clusters that need to be removed due to config change, pool %s", p.Name)
+	ctx.Log.Info("Pool GC", "initiating cleanup of clusters that need to be removed due to generic change, pool %s", p.Name)
 	_ = p.gcByConfigChange(ctx)
 	return nil
 }
@@ -143,8 +142,8 @@ func provisionClusters()  {
 }
 
 //Reconcile ensured that expected and actual pool size match
-func (p Pool) Reconcile(ctx *config.Context) error {
-	logging.Info("Pool Reconcile", "initiating reconciliation for pool %s", p.Name)
+func (p Pool) Reconcile(ctx *generic.Context) error {
+	ctx.Log.Info("Pool Reconcile", "initiating reconciliation for pool %s", p.Name)
 	//Fetch all clusterlist
 	currentClusters := 0
 	activatedClusters := 0
@@ -163,7 +162,7 @@ func (p Pool) Reconcile(ctx *config.Context) error {
 	}
 	//Only if current clusterlist are less than expected
 	if currentClusters < p.Size {
-		logging.Info("Pool Reconcile", "available clusters do not match expected for pool %s", p.Name)
+		ctx.Log.Info("Pool Reconcile", "available clusters do not match expected for pool %s", p.Name)
 		tp := 0
 		//if max pool size <= pool size then we dont even need to look at pool size
 		if p.MaxSize <= p.Size {
@@ -178,7 +177,7 @@ func (p Pool) Reconcile(ctx *config.Context) error {
 		//provision tp clusterlist
 		//if no parallel provisioning, provision in series
 		if p.ParallelProvisioning <= 1 {
-			logging.Info("Pool Reconcile", "allocating %d clusters for pool %s serially", tp, p.Name)
+			ctx.Log.Info("Pool Reconcile", "allocating %d clusters for pool %s serially", tp, p.Name)
 			for i:= 0; i < tp; i++ {
 				err = p.provision(ctx)
 				if err != nil {
@@ -208,13 +207,14 @@ func (p Pool) Reconcile(ctx *config.Context) error {
 				}
 				wg.Wait()
 				if len(chanerror) > 0 {
+					ctx.Log.Info("Pool reconcile", "failed to provision some clusers")
 					return errors.New("failed to provision some clusters")
 					// todo use this for some sore of back off login
 				}
 			}
 		}
 	} else {
-		logging.Info("Pool Reconcile", "skipping reconcilation for pool %s as actual matches expected", p.Name)
+		ctx.Log.Info("Pool Reconcile", "skipping reconcilation for pool %s as actual matches expected", p.Name)
 	}
 	return nil
 }

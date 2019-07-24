@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/json"
 	"io/ioutil"
-	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/config"
+	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/generic"
 	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/data/database"
 	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/data/pools"
 	"github.com/prometheus/common/log"
@@ -11,26 +11,34 @@ import (
 )
 
 func main()  {
+	if len(os.Args) < 1{
+		log.Fatalln("please pass a parameter")
+	}
 	op := os.Args[1]
-	ctx, err := config.NewContext()
+	ctx, err := generic.NewContext("test-db-cli")
 	if err != nil {
 		log.Fatal(err.Error())
 	}
+	//this if is just to remove warning
+	if ctx == nil {
+		return
+	}
+
 	switch op {
 	case "loadpool":
 		pool := pools.NewEmptyPool()
 		fl := os.Args[2]
 		data, err := ioutil.ReadFile(fl)
 		if err != nil {
-			log.Fatalf("unable to read data %s", err.Error())
+			ctx.Log.Fatal("loadpool", err, "unable to read data")
 		}
 
 		err = json.Unmarshal(data, &pool)
 		if err != nil {
-			log.Fatalf("unable to unmarshal pool %s", err.Error())
+			ctx.Log.Fatal("loadpool", err, "unable to unmarshal pool")
 		}
 		key := pools.GetPoolKey(pool.Name)
-		database.SaveinKVDB(&ctx, key, string(data))
+		database.SaveinKVDB(ctx, key, string(data))
 		break
 	case "getpool":
 		break
