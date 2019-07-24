@@ -28,6 +28,11 @@ Make a test DB directory
 ```
 mkdir `pwd`/test-badger
 ```
+Load sample pool config
+
+```
+BADGER_DIR="`pwd`/test-badger" ./db-cli `pwd`/openshift-cluster-pooler/pool-examples/minishift-simple/minishift-simple.json
+```
 
 **Warning:** `db-cli` is a quick and dirty cli built to overcome missing cli for badger db.
 It has limited function and should not be considered as replacement for the admin cli
@@ -35,18 +40,12 @@ which is in the pipeline
 
 ### Copy minishift provision scripts
 
-Add minishift pool config example to db
-
-```
-BADGER_DIR="`pwd`/test-badger" ./db-cli `pwd`/openshift-cluster-pooler/pool-examples/minishift-simple/minishift-simple.json
-```
-
-### Run pool manager
-
 Copy scripts to /usr/bin/
 ```
 $ cp -avrf pool-examples/minishift-simple/usr/bin/* /usr/bin/
 ```
+
+### Run pool manager
 
 Build pool manager
 
