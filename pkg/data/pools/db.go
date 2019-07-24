@@ -22,8 +22,8 @@ func (p Pool) Save(ctx *generic.Context) error  {
 	return nil
 }
 
-//Delete deletes the pool from database
-func (p Pool) Delete(ctx *generic.Context) {
+//DeleteInDB deletes the pool from database
+func (p Pool) DeleteInDB(ctx *generic.Context) {
 	database.DeleteInKVDB(ctx, GetPoolKey(p.Name))
 }
 

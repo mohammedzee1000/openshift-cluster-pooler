@@ -2,11 +2,11 @@ package main
 
 import (
 	"encoding/json"
-	"io/ioutil"
-	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/generic"
 	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/data/database"
 	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/data/pools"
+	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/generic"
 	"github.com/prometheus/common/log"
+	"io/ioutil"
 	"os"
 )
 

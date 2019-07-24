@@ -16,24 +16,24 @@ func GetClusterKey(clusterid string, poolname string) string {
 	return fmt.Sprintf("%s-%s-%s", Cluster_Prefix, poolname, clusterid)
 }
 
-//Save saves clusters information in database
+//Save saves items information in database
 func (c Cluster) Save(ctx *generic.Context) error {
 	val, err := json.Marshal(c)
 	if err != nil {
-		return errors.New("failed to marshal clusters struct")
+		return errors.New("failed to marshal items struct")
 	}
 	database.SaveinKVDB(ctx, GetClusterKey(c.ClusterID, c.PoolName), string(val))
 	return nil
 }
 
-//Delete deletes clusters information from database
+//DeleteInDB deletes items information from database
 func (c Cluster) Delete(ctx *generic.Context)  {
 	database.DeleteInKVDB(ctx, GetClusterKey(c.ClusterID, c.PoolName))
 }
 
-//List gets all the clusters in database
-func List(ctx *generic.Context) ([]Cluster, error)  {
-	var clusters []Cluster
+//List gets all the items in database
+func List(ctx *generic.Context) (*ClusterList, error)  {
+	clusters := NewClusterList()
 	var err error
 	d := database.GetMultipleWithPrefixFromKVDB(ctx, Cluster_Prefix)
 	for _, item := range d {
@@ -42,14 +42,14 @@ func List(ctx *generic.Context) ([]Cluster, error)  {
 		if err != nil {
 			return nil, err
 		}
-		clusters = append(clusters, cl)
+		clusters.Append(cl)
 	}
 	return clusters, nil
 }
 
-//ClustersInPool gets all the clusters in a specified pool
-func ClustersInPool(ctx *generic.Context, poolName string) ([]Cluster,error) {
-	var clusters []Cluster
+//ClustersInPool gets all the items in a specified pool
+func ClustersInPool(ctx *generic.Context, poolName string) (*ClusterList, error) {
+	clusters := NewClusterList()
 	var err error
 	d := database.GetMultipleWithPrefixFromKVDB(ctx, GetClusterPoolKey(poolName))
 	for _, item := range d {
@@ -58,12 +58,12 @@ func ClustersInPool(ctx *generic.Context, poolName string) ([]Cluster,error) {
 		if err != nil {
 			return nil, err
 		}
-		clusters = append(clusters, cl)
+		clusters.Append(cl)
 	}
 	return clusters, nil
 }
 
-//ClusterByID gets a clusters in a pool with specified ID
+//ClusterByID gets a items in a pool with specified ID
 func ClusterByID(ctx *generic.Context, poolName string, clusterid string) (*Cluster, error) {
 	var cluster Cluster
 	val := database.GetExactFromKVDB(ctx, GetClusterKey(clusterid, poolName))

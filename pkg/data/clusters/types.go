@@ -53,3 +53,16 @@ func DeepEqual(x *Cluster, y *Cluster) bool {
 	//Todo implement
 	return false
 }
+
+type ClusterList struct {
+	items []Cluster
+}
+
+func NewClusterList() *ClusterList {
+	var clusters []Cluster
+	return WrapClusterList(clusters)
+}
+
+func WrapClusterList(clusters []Cluster) *ClusterList  {
+	return &ClusterList{items: clusters}
+}

@@ -1,8 +1,8 @@
-package clientapiserver
+package common
 
 import (
 	"encoding/json"
-	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/cli/apierror"
+	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/cli/apiserver/apierror"
 	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/data/pools"
 	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/generic"
 	"net/http"
