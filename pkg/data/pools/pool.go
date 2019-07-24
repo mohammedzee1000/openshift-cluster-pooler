@@ -132,14 +132,11 @@ func (p Pool) GC(ctx *generic.Context) error  {
 	//Fetch all clusterlist
 	ctx.Log.Info("Pool GC", "initiating cleanup of clusters that have met some conditions, pool %s", p.Name)
 	_ = p.gcByCondition(ctx)
-	ctx.Log.Info("Pool GC", "initiating cleanup of clusters that need to be removed due to generic change, pool %s", p.Name)
+	ctx.Log.Info("Pool GC", "initiating cleanup of clusters that need to be removed due to config change, pool %s", p.Name)
 	_ = p.gcByConfigChange(ctx)
 	return nil
 }
 
-func provisionClusters()  {
-
-}
 
 //Reconcile ensured that expected and actual pool size match
 func (p Pool) Reconcile(ctx *generic.Context) error {

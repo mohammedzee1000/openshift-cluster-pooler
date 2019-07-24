@@ -46,9 +46,13 @@ func NewContext(name string) (*Context, error) {
 
 func (c Context) NewBadgerConnection() (*badger.DB, error)  {
 	// todo make it log to a file instead
-	emptyLogger := logrus.New()
-	emptyLogger.Out = ioutil.Discard
-	db, err := badger.Open(badger.DefaultOptions(c.BadgerDir).WithLogger(emptyLogger))
+	bo := badger.DefaultOptions(c.BadgerDir)
+	if !c.Debug {
+		emptyLogger := logrus.New()
+		emptyLogger.Out = ioutil.Discard
+		bo = bo.WithLogger(emptyLogger)
+	}
+	db, err := badger.Open(bo)
 	if err != nil {
 		return nil, err
 	}

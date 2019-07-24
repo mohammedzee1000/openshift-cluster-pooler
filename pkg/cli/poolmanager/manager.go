@@ -32,6 +32,7 @@ func (pm PoolManager) Run()  {
 		if err != nil {
 			pm.context.Log.Fatal("Pool Manager", err, "failed to retrieve pool list")
 		}
+		//todo have a way to gc clusters whose config is removed
 		if len(pools) > 0 {
 			for _, item := range pools{
 				_ = item.GC(pm.context)
