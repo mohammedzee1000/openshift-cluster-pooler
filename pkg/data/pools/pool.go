@@ -2,6 +2,7 @@ package pools
 
 import (
 	"errors"
+	"fmt"
 	"sync"
 	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/config"
 	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/data/clusters"
@@ -9,45 +10,12 @@ import (
 	"time"
 )
 
-func calculateTimeoutPeriod(period int) time.Duration {
-	tp := time.Hour
-	for i := 1; i < period; i++ {
-		tp = tp + time.Hour
-	}
-	return tp
-}
 
-//GC deprovisions clusters that have failed or outlived a timeout
-func (p Pool) GC(ctx *config.Context) error  {
-	logging.Info("Pool GC", "initiating GC of pool %s", p.Name)
-	//Fetch all clusterlist
-	var gcclusters []clusters.Cluster
-	clusterlist, err := clusters.ClustersInPool(ctx, p.Name)
-	if err != nil {
-		return err
-	}
-	// gather clusterlist to delete
-	for _, c := range clusterlist {
-		if c.State == clusters.State_Failed || c.State == clusters.State_Cleanup {
-			gcclusters = append(gcclusters, c)
-		} else if c.State == clusters.State_Used || c.State == clusters.State_Success {
-			//dead time, knows when the clusterlist is supposed to have died
-			var dt time.Time
-			// Calculate time passed as needed
-			if c.State == clusters.State_Success {
-				dt = c.CreatedOn.Add(time.Hour * time.Duration(p.UnusedClusterTimeout))
-			} else {
-				dt = c.ActivatedOn.Add(time.Hour * time.Duration(p.UsedClusterTimeout))
-			}
-
-			//if current time is after dead time, cleanup !!
-			if dt.Before(time.Now()) {
-				gcclusters = append(gcclusters, c)
-			}
-		}
-	}
+func (p Pool) gcCollect(ctx *config.Context, componentSubName string,gcclusters []clusters.Cluster) error  {
+	var err error
+	componentName := fmt.Sprintf("Pool GC - %s", componentSubName)
 	if len(gcclusters) <= 0 {
-		logging.Info("Pool GC", "no garbage in pool %s, skipping", p.Name)
+		logging.Info(componentName, "no garbage in pool %s, skipping", p.Name)
 		return nil
 	}
 	// Delete clusterlist as needed
@@ -59,10 +27,10 @@ func (p Pool) GC(ctx *config.Context) error  {
 				if len(p.ForceDeprovisionCommand) > 0 {
 					err = p.deprovision(ctx, c.ClusterID, true)
 					if err != nil {
-						logging.Error("Pool GC", "Failed to force deprovision cluster : %s", err.Error())
+						logging.Error(componentName, "Failed to force deprovision cluster : %s", err.Error())
 					}
 				} else {
-					logging.Error("Pool GC", "Failed to deprovision cluster : %s", err.Error())
+					logging.Error(componentName, "Failed to deprovision cluster : %s", err.Error())
 				}
 			}
 		}
@@ -111,7 +79,70 @@ func (p Pool) GC(ctx *config.Context) error  {
 	return nil
 }
 
-//Reconcole ensured that expected and actual pool size match
+func (p Pool) gcByCondition(ctx *config.Context) error  {
+	var gcclusters []clusters.Cluster
+	clusterlist, err := clusters.ClustersInPool(ctx, p.Name)
+	if err != nil {
+		return err
+	}
+	// gather clusterlist to delete
+	for _, c := range clusterlist {
+		if c.State == clusters.State_Failed || c.State == clusters.State_Cleanup {
+			gcclusters = append(gcclusters, c)
+		} else if c.State == clusters.State_Used || c.State == clusters.State_Success {
+			//dead time, knows when the clusterlist is supposed to have died
+			var dt time.Time
+			// Calculate time passed as needed
+			if c.State == clusters.State_Success {
+				dt = c.CreatedOn.Add(time.Hour * time.Duration(p.UnusedClusterTimeout))
+			} else {
+				dt = c.ActivatedOn.Add(time.Hour * time.Duration(p.UsedClusterTimeout))
+			}
+
+			//if current time is after dead time, cleanup !!
+			if dt.Before(time.Now()) {
+				gcclusters = append(gcclusters, c)
+			}
+		}
+	}
+	return p.gcCollect(ctx, "By Condition",gcclusters)
+}
+
+func (p Pool) gcByConfigChange(ctx *config.Context) error {
+	clusterlist, err := clusters.ClustersInPool(ctx, p.Name)
+	if err != nil {
+		return err
+	}
+	// find out how many clusters need to be removed
+	// len of success clusters and used clusters
+	successclusters := clusters.ClustersInStateIn(clusterlist, clusters.State_Success)
+	successclustercount := len(successclusters)
+	usedclusterscount := len(clusters.ClustersInStateIn(clusterlist, clusters.State_Used))
+	var toremove int
+	if p.MaxSize > p.Size && usedclusterscount >= p.Size - 1 {
+		toremove = successclustercount - p.MaxSize
+	}  else {
+		toremove = successclustercount - p.Size
+	}
+	return p.gcCollect(ctx, "By Config Change", clusters.OldestN(clusterlist, toremove))
+}
+
+//GC deprovisions clusters that have failed or outlived a timeout
+func (p Pool) GC(ctx *config.Context) error  {
+	logging.Info("Pool GC", "initiating GC of pool %s", p.Name)
+	//Fetch all clusterlist
+	logging.Info("Pool GC", "initiating cleanup of clusters that have met some conditions, pool %s", p.Name)
+	_ = p.gcByCondition(ctx)
+	logging.Info("Pool GC", "initiating cleanup of clusters that need to be removed due to config change, pool %s", p.Name)
+	_ = p.gcByConfigChange(ctx)
+	return nil
+}
+
+func provisionClusters()  {
+
+}
+
+//Reconcile ensured that expected and actual pool size match
 func (p Pool) Reconcile(ctx *config.Context) error {
 	logging.Info("Pool Reconcile", "initiating reconciliation for pool %s", p.Name)
 	//Fetch all clusterlist

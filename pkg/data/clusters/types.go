@@ -41,3 +41,15 @@ func NewCluster(clusterid string, poolName string) *Cluster {
 	c.State = State_Provisioning
 	return c
 }
+
+func Equal(x *Cluster, y *Cluster) bool {
+	if x.ClusterID == y.ClusterID {
+		return true
+	}
+	return false
+}
+
+func DeepEqual(x *Cluster, y *Cluster) bool {
+	//Todo implement
+	return false
+}
