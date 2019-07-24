@@ -3,6 +3,7 @@ package pools
 import (
 	"errors"
 	"fmt"
+	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/data/database"
 	"sync"
 	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/generic"
 	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/data/clusters"
@@ -214,4 +215,10 @@ func (p Pool) Reconcile(ctx *generic.Context) error {
 		ctx.Log.Info("Pool Reconcile", "skipping reconcilation for pool %s as actual matches expected", p.Name)
 	}
 	return nil
+}
+
+//Activate activates a cluster, if it is available. This is the only direct db func
+//in pool as we need to ensure cluster activation is a transaction
+func (p Pool) Activate(ctx *generic.Context) (*clusters.Cluster, error)  {
+	return database.ActivaeClusterInPool(ctx, &p)
 }

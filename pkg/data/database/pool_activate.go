@@ -1,23 +1,22 @@
-package pools
+package database
 
 import (
 	"encoding/json"
 	"github.com/dgraph-io/badger"
-	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/generic"
-	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/data/database"
-	"github.com/pkg/errors"
-
 	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/data/clusters"
+	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/data/pools"
+	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/generic"
+	"github.com/pkg/errors"
 )
-
-//Activates a cluster, if it is available. This is the only direct db func
-// in pool as we need to ensure cluster activation is a transaction
-func (p Pool) Activate(ctx *generic.Context) (*clusters.Cluster, error)  {
+//ActivateClusterInPool a cluster, if it is available. This is the only direct db func
+//in pool as we need to ensure cluster activation is a transaction
+//in here because its only pool level op that needs full fledged lock
+func ActivaeClusterInPool(ctx *generic.Context, p *pools.Pool) (*clusters.Cluster, error)  {
 	var c clusters.Cluster
 	var found bool
 	db, err := ctx.NewBadgerConnection()
 	if err != nil {
-		database.HandleError(ctx, err)
+		HandleError(ctx, err)
 	}
 	defer db.Close()
 	// cluster activation transaction
@@ -62,6 +61,6 @@ func (p Pool) Activate(ctx *generic.Context) (*clusters.Cluster, error)  {
 	if !found {
 		return nil, errors.New("could not get a cluster to activae")
 	}
-	database.HandleError(ctx, err)
+	HandleError(ctx, err)
 	return &c, nil
 }
