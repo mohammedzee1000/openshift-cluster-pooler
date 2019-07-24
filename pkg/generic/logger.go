@@ -17,11 +17,13 @@ type LogHander struct {
 	logger *logrus.Entry
 }
 
-func NewLogger(name string) *LogHander {
+func NewLogger(name string, debug bool) *LogHander {
 	l := logrus.New()
+
 	l.SetFormatter(&logrus.TextFormatter{
 		FullTimestamp: true,
 	})
+	l.SetReportCaller(debug)
 	lh := LogHander{logger: logrus.NewEntry(l).WithField("name", name)}
 	return &lh
 }
