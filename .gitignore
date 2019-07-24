@@ -4,6 +4,7 @@
 # Build results
 pool-manager
 db-cli
+client-api-server
 
 # test files
 test-badger
