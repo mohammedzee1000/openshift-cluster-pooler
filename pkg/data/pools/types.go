@@ -1,6 +1,9 @@
 package pools
 
-const Pool_Key  = "Pool"
+const (
+	Pool_Key  = "Pool"
+	Cleanup_Pool_Key = "Cleanup-Pool"
+)
 
 //Pool repersents generic of a pool
 type Pool struct {

@@ -13,6 +13,26 @@ func HandleError(ctx *generic.Context, err error)  {
 		}
 }
 
+//KeyExistsInKVDB checks if paticular key not in DB
+func KeyExistsInKVDB(ctx *generic.Context, key string) bool {
+	exists := false
+	db, err := ctx.NewBadgerConnection()
+	if err != nil {
+		HandleError(ctx, err)
+	}
+	defer db.Close()
+	err = db.View(func(txn *badger.Txn) error {
+		_, err1 := txn.Get([]byte(key))
+		if err1 != nil && err1 != badger.ErrKeyNotFound {
+			return err1
+		}
+		exists = true
+		return nil
+	})
+	HandleError(ctx, err)
+	return exists
+}
+
 //SaveinKVDB saved specified key value pair in database
 func SaveinKVDB(ctx *generic.Context, key string, data string) {
 	db, err := ctx.NewBadgerConnection()

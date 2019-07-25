@@ -55,7 +55,7 @@ func DeepEqual(x *Cluster, y *Cluster) bool {
 }
 
 type ClusterList struct {
-	items []Cluster
+	Items []Cluster
 }
 
 func NewClusterList() *ClusterList {
@@ -64,5 +64,5 @@ func NewClusterList() *ClusterList {
 }
 
 func WrapClusterList(clusters []Cluster) *ClusterList  {
-	return &ClusterList{items: clusters}
+	return &ClusterList{Items: clusters}
 }

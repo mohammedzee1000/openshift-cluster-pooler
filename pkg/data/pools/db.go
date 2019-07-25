@@ -12,8 +12,12 @@ func GetPoolKey(name string) string {
 	return fmt.Sprintf("%s-%s", Pool_Key, name)
 }
 
-//Save Saves the pool into database
-func (p Pool) Save(ctx *generic.Context) error  {
+func GetCleanupPoolKey(name string) string {
+	return fmt.Sprintf("%s-%s", Cleanup_Pool_Key, name)
+}
+
+//saveInDB Saves the pool into database
+func (p Pool) saveInDB(ctx *generic.Context) error  {
 	val, err := json.Marshal(p)
 	if err != nil {
 		return errors.New("failed to marshal clusters struct")
@@ -22,16 +26,41 @@ func (p Pool) Save(ctx *generic.Context) error  {
 	return nil
 }
 
-//DeleteInDB deletes the pool from database
-func (p Pool) DeleteInDB(ctx *generic.Context) {
+//deleteInDB deletes the pool from database
+func (p Pool) deleteInDB(ctx *generic.Context) {
 	database.DeleteInKVDB(ctx, GetPoolKey(p.Name))
 }
 
+//Mark for removal marks a pool for garbage collection
+func (p Pool) MarkForRemoval(ctx *generic.Context) error {
+	val, err := json.Marshal(p)
+	if err != nil {
+		return errors.New("failed to marshal clusters struct")
+	}
+	database.SaveinKVDB(ctx, GetCleanupPoolKey(p.Name), string(val))
+	p.deleteInDB(ctx)
+	return nil
+}
+
+func (p Pool) IsMarkedForRemoval(ctx *generic.Context) bool {
+	poolNameCleanup := GetCleanupPoolKey(p.Name)
+	if database.KeyExistsInKVDB(ctx, poolNameCleanup) {
+		return true
+	}
+	return false
+}
+
 //List gets all pools in database
-func List(ctx *generic.Context) ([]Pool, error)  {
+func List(ctx *generic.Context, removal bool) ([]Pool, error)  {
 	var pools []Pool
+	var key string
+	if removal {
+		key = Cleanup_Pool_Key
+	} else {
+		key = Pool_Key
+	}
 	var err error
-	d := database.GetMultipleWithPrefixFromKVDB(ctx, Pool_Key)
+	d := database.GetMultipleWithPrefixFromKVDB(ctx, key)
 	for _, item := range d {
 		var p Pool
 		err = json.Unmarshal([]byte(item), &p)
@@ -43,10 +72,17 @@ func List(ctx *generic.Context) ([]Pool, error)  {
 	return pools, nil
 }
 
-//PoolByName gets a pool of specified name
-func PoolByName(ctx *generic.Context, name string) (*Pool, error)  {
+//PoolByName gets a pool of specified name. If removal is set, then it gets the pool only
+//if it marked for removal
+func PoolByName(ctx *generic.Context, name string, removal bool) (*Pool, error)  {
 	var p Pool
-	val := database.GetExactFromKVDB(ctx, GetPoolKey(name))
+	var poolkey string
+	if removal {
+		poolkey = GetCleanupPoolKey(name)
+	} else {
+		poolkey = GetPoolKey(name)
+	}
+	val := database.GetExactFromKVDB(ctx, poolkey)
 	err := json.Unmarshal([]byte(val), &p)
 	if err != nil {
 		return nil, err

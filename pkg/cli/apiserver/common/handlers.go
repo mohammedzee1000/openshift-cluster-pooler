@@ -14,7 +14,7 @@ func ListPools(w http.ResponseWriter, r *http.Request)  {
 	if err != nil {
 		_ = json.NewEncoder(w).Encode(apierror.NewContextError())
 	}
-	p, err := pools.List(ctx)
+	p, err := pools.List(ctx, false)
 	if err != nil {
 		_ = json.NewEncoder(w).Encode(apierror.NewListError(err.Error()))
 	}

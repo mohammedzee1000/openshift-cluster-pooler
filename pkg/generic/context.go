@@ -30,7 +30,7 @@ func NewContext(name string) (*Context, error) {
 	ctx := Context{&internalContext{}}
 	ctx.Name = name
 	ctx.LogsDir = "/var/log/openshift-clusters-pools"
-	ctx.BadgerDir = "/var/openshift-cluster-pools/badger"
+	ctx.BadgerDir = "/tmp/badger"
 	badgerenv := os.Getenv("BADGER_DIR")
 	debugenv := os.Getenv("DEBUG")
 	if len(badgerenv) > 0 {
