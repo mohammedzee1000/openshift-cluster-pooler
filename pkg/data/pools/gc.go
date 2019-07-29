@@ -53,7 +53,7 @@ func (p Pool) gcCollect(ctx *generic.Context, componentSubName string,gcclusters
 			wg := new(sync.WaitGroup)
 			wg.Add(todeprovision-1)
 			for i := 0; i < todeprovision; i++ {
-				go func() {
+				go func(i int) {
 					gcclusters.Items[i].State = clusters.State_Cleanup
 					_ = gcclusters.Items[i].Save(ctx)
 					err := p.deprovision(ctx, gcclusters.Items[i].ClusterID, false)
@@ -68,7 +68,7 @@ func (p Pool) gcCollect(ctx *generic.Context, componentSubName string,gcclusters
 						}
 					}
 					wg.Done()
-				}()
+				}(i)
 			}
 			wg.Wait()
 			if len(chanerrors) > 0 {
