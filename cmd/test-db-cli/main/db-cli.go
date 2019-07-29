@@ -12,9 +12,19 @@ import (
 	"os"
 )
 
+func help()  {
+	sp := "save-pool <path-of-pool-config>"
+	gp := "get-pool <name-of-pool>"
+	gpd := "get-pool-del <name-of-pool>"
+	dp := "del-pool <name-of-pool>"
+	lc := "list-clusters"
+	ac := "get-cluster-from-pool <name-of-pool>"
+	fmt.Printf("invalid command, following are possible:\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s", sp, gp, gpd, dp, lc, ac)
+}
+
 func main()  {
-	if len(os.Args) < 1{
-		log.Fatalln("please pass a parameter")
+	if len(os.Args) < 1 {
+		help()
 	}
 	op := os.Args[1]
 	ctx, err := generic.NewContext("test-db-cli")
@@ -90,12 +100,10 @@ func main()  {
 			}
 			fmt.Println(data)
 		}
+	case "help":
+		help()
 	default:
-		sp := "save-pool <path>"
-		gp := "get-pool <name>"
-		gpd := "get-pool-del <name>"
-		dp := "del-pool <name>"
-		lc := "list-clusters"
-		fmt.Printf("invalid command, following are possible:\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s", sp, gp, gpd, dp, lc)
+		fmt.Println("please provide a valid option option")
+		help()
 	}
 }
