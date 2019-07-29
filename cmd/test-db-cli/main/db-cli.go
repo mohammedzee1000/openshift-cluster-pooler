@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/data/clusters"
 	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/data/database"
 	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/data/pools"
 	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/generic"
@@ -26,59 +27,75 @@ func main()  {
 	}
 
 	switch op {
-	case "loadpool":
+	case "save-pool":
 		pool := pools.NewEmptyPool()
 		fl := os.Args[2]
 		data, err := ioutil.ReadFile(fl)
 		if err != nil {
-			ctx.Log.Fatal("loadpool", err, "unable to read data")
+			ctx.Log.Fatal("save-pool", err, "unable to read data")
 		}
 
 		err = json.Unmarshal(data, &pool)
 		if err != nil {
-			ctx.Log.Fatal("loadpool", err, "unable to unmarshal pool")
+			ctx.Log.Fatal("save-pool", err, "unable to unmarshal pool")
 		}
 		key := pools.GetPoolKey(pool.Name)
 		database.SaveinKVDB(ctx, key, string(data))
-		ctx.Log.Info("loadpool", "Loading pool into DB")
+		ctx.Log.Info("save-pool", "Loading pool into DB")
 		break
-	case "getpool":
+	case "get-pool":
 		pnm := os.Args[2]
 		p, err := pools.PoolByName(ctx, pnm, false)
 		if err != nil {
-			ctx.Log.Fatal("getpool", err,"could not get pool info")
+			ctx.Log.Fatal("get-pool", err,"could not get pool info")
 		}
 		d, err := json.Marshal(p)
 		if err != nil {
-			log.Fatal("getpool", err, "failed to unmarshal data")
+			log.Fatal("get-pool", err, "failed to unmarshal data")
 		}
 		fmt.Println(string(d))
 		break
-	case "getpooldel":
+	case "get-pool-del":
 		pnm := os.Args[2]
 		p, err := pools.PoolByName(ctx, pnm, true)
 		if err != nil {
-			ctx.Log.Fatal("getpooldel", err,"could not get pool info")
+			ctx.Log.Fatal("get-pool-del", err,"could not get pool info")
 		}
 		d, err := json.Marshal(p)
 		if err != nil {
-			log.Fatal("getpooldel", err, "failed to unmarshal data")
+			log.Fatal("get-pool-del", err, "failed to unmarshal data")
 		}
 		fmt.Println(string(d))
 		break
-	case "delpool":
+	case "del-pool":
 		pnd := os.Args[2]
 		p, err := pools.PoolByName(ctx, pnd, false)
 		if err != nil{
-			ctx.Log.Fatal("delpool", err, "failed to retrieve pool of that name")
+			ctx.Log.Fatal("del-pool", err, "failed to retrieve pool of that name")
 		}
 		err = p.MarkForRemoval(ctx)
 		if err != nil {
-			ctx.Log.Fatal("delpool", err, "failed to mark pool for removal")
+			ctx.Log.Fatal("del-pool", err, "failed to mark pool for removal")
 		}
-		ctx.Log.Info("delpool", "marked pool %s for removal. it will be cleaned in next gc cycle by pool manager", pnd)
+		ctx.Log.Info("del-pool", "marked pool %s for removal. it will be cleaned in next gc cycle by pool manager", pnd)
+	case "list-clusters":
+		cl, err := clusters.List(ctx)
+		if err != nil {
+			ctx.Log.Fatal("list-clusters", err, "cannot list clusters")
+		}
+		for _, item := range cl.Items{
+			data, err := json.Marshal(item)
+			if err != nil {
+				ctx.Log.Error("list-clusters", err, "failed to unmarshal cluster info")
+			}
+			fmt.Println(data)
+		}
 	default:
-		log.Fatal("invalid option, try `loadpool filename` or getpool poolname")
-
+		sp := "save-pool <path>"
+		gp := "get-pool <name>"
+		gpd := "get-pool-del <name>"
+		dp := "del-pool <name>"
+		lc := "list-clusters"
+		fmt.Printf("invalid command, following are possible:\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s", sp, gp, gpd, dp, lc)
 	}
 }
