@@ -21,7 +21,7 @@ $ git clone mohammedzee1000/openshift-cluster-pool && cd openshift-cluster-pool
 Build db-cli
 
 ```
-go build cmd/test-db-cli/main/db-cli.go
+go build cmd/test-db-cli/db-cli.go
 ```
 
 Make a test DB directory
@@ -50,7 +50,7 @@ $ cp -avrf pool-examples/minishift-simple/usr/bin/* /usr/bin/
 Build pool manager
 
 ```
-$ go build cmd/pool-manager/main/pool-manager.go
+$ go build cmd/pool-manager/pool-manager.go
 ```
 
 
