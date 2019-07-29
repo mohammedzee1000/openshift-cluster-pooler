@@ -31,7 +31,7 @@ mkdir `pwd`/test-badger
 Load sample pool config
 
 ```
-BADGER_DIR="`pwd`/test-badger" ./db-cli save-pool `pwd`/openshift-cluster-pooler/pool-examples/minishift-simple/minishift-simple.json
+BADGER_DIR="`pwd`/test-badger" ./db-cli save-pool `pwd`/pool-examples/minishift-simple/minishift-simple.json
 ```
 
 **Warning:** `db-cli` is a quick and dirty cli built to overcome missing cli for badger db.
