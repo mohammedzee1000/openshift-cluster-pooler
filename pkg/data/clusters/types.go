@@ -25,7 +25,7 @@ type Cluster struct {
 	CAFile 		string `json:"ca-file"`
 	CertFile    string `json:"cert-file"`
 	KeyFile 	string `json:"key-file"`
-	ExtraInfo	string `json:"extra_-nfo"`
+	ExtraInfo	string `json:"extra-nfo"`
 	CreatedOn   time.Time `json:"created-on"`
 	ActivatedOn time.Time `json:"activated-on"`
 }
