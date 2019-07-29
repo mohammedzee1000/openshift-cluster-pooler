@@ -59,3 +59,9 @@ Start pool manager
 ```
 BADGER_DIR="`pwd`/test-badger" ./pool-manager
 ```
+
+### Other important options of db-cli
+
+As already stated `db-cli` is only for testing purposes. But you can use still use it.
+Just do `./db-cli help` to find other commands
+

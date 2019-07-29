@@ -88,6 +88,7 @@ func main()  {
 			ctx.Log.Fatal("del-pool", err, "failed to mark pool for removal")
 		}
 		ctx.Log.Info("del-pool", "marked pool %s for removal. it will be cleaned in next gc cycle by pool manager", pnd)
+		break
 	case "list-clusters":
 		cl, err := clusters.List(ctx)
 		if err != nil {
@@ -98,10 +99,28 @@ func main()  {
 			if err != nil {
 				ctx.Log.Error("list-clusters", err, "failed to unmarshal cluster info")
 			}
-			fmt.Println(data)
+			fmt.Println(string(data))
 		}
+		break
+	case "get-cluster-from-pool":
+		pn := os.Args[2]
+		p, err := pools.PoolByName(ctx, pn, false)
+		if err != nil {
+			ctx.Log.Fatal("get-cluster-from-pool", err, "failed to get a cluster")
+		}
+		c, err := p.UseCluster(ctx)
+		if err != nil{
+			ctx.Log.Fatal("get-cluster-from-pool", err, "failed to get a cluster")
+		}
+		data, err := json.Marshal(c)
+		if err != nil {
+			ctx.Log.Fatal("get-cluster-from-pool", err, "failed to unmarshal cluster info")
+		}
+		fmt.Println(string(data))
+		break
 	case "help":
 		help()
+		break
 	default:
 		fmt.Println("please provide a valid option option")
 		help()
