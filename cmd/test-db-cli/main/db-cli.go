@@ -106,7 +106,7 @@ func main()  {
 		pn := os.Args[2]
 		p, err := pools.PoolByName(ctx, pn, false)
 		if err != nil {
-			ctx.Log.Fatal("get-cluster-from-pool", err, "failed to get a cluster")
+			ctx.Log.Fatal("get-cluster-from-pool", err, "failed to get a cluster pool")
 		}
 		c, err := p.UseCluster(ctx)
 		if err != nil{

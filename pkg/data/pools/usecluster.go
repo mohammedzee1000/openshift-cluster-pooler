@@ -22,6 +22,7 @@ func (p Pool) UseCluster(ctx *generic.Context) (*clusters.Cluster, error)  {
 	defer db.Close()
 	// cluster activation transaction
 	err = db.Update(func(txn *badger.Txn) error {
+
 		//collect all clusters in pool
 		keyprefix := clusters.GetClusterPoolKey(p.Name)
 		it := txn.NewIterator(badger.DefaultIteratorOptions)
@@ -38,9 +39,10 @@ func (p Pool) UseCluster(ctx *generic.Context) (*clusters.Cluster, error)  {
 				}
 				// if one of the clusters we are iterating can be activated, activate it and found is true
 				if c.State == clusters.State_Success {
-					if p.ExpiresOn(&c).Before(time.Now().Add(3 * time.Minute)) {
+					if time.Now().Add(3 * time.Minute).Before(p.ExpiresOn(&c)) {
 						found = true
 						c.State = clusters.State_Used
+						c.ActivatedOn = time.Now()
 						data, err := json.Marshal(&c)
 						if err != nil{
 							return err
