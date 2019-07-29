@@ -16,13 +16,19 @@ func GetCleanupPoolKey(name string) string {
 	return fmt.Sprintf("%s-%s", Cleanup_Pool_Key, name)
 }
 
-//saveInDB Saves the pool into database
-func (p Pool) saveInDB(ctx *generic.Context) error  {
+//SaveInDB Saves the pool into database
+func (p Pool) SaveInDB(ctx *generic.Context, removal bool) error  {
+	var key string
 	val, err := json.Marshal(p)
 	if err != nil {
-		return errors.New("failed to marshal clusters struct")
+		return errors.New("failed to marshal pool struct")
 	}
-	database.SaveinKVDB(ctx, GetPoolKey(p.Name), string(val))
+	if !removal {
+		key = GetPoolKey(p.Name)
+	} else {
+		key = GetCleanupPoolKey(p.Name)
+	}
+	database.SaveinKVDB(ctx, key, string(val))
 	return nil
 }
 

@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/data/clusters"
-	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/data/database"
 	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/data/pools"
 	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/generic"
 	"github.com/prometheus/common/log"
@@ -44,13 +43,11 @@ func main()  {
 		if err != nil {
 			ctx.Log.Fatal("save-pool", err, "unable to read data")
 		}
-
 		err = json.Unmarshal(data, &pool)
 		if err != nil {
 			ctx.Log.Fatal("save-pool", err, "unable to unmarshal pool")
 		}
-		key := pools.GetPoolKey(pool.Name)
-		database.SaveinKVDB(ctx, key, string(data))
+		_ = pool.SaveInDB(ctx, false)
 		ctx.Log.Info("save-pool", "Loading pool into DB")
 		break
 	case "get-pool":
