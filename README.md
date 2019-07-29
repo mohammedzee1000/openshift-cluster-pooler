@@ -65,3 +65,6 @@ BADGER_DIR="`pwd`/test-badger" ./pool-manager
 As already stated `db-cli` is only for testing purposes. But you can use still use it.
 Just do `./db-cli help` to find other commands
 
+## In the pipeline
+ - Admin API Server + client to replace db-cli
+ - Client API server + client to allow users to list pools and get a cluster from pool / list its information
