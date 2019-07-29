@@ -20,6 +20,8 @@ func (p Pool) gcCollect(ctx *generic.Context, componentSubName string,gcclusters
 	// If no paralled deprovisioning, do it serially
 	if p.ParallelDeProvisioning <= 1 {
 		for _, item := range gcclusters.Items {
+			item.State = clusters.State_Cleanup
+			_ = item.Save(ctx)
 			err = p.deprovision(ctx, item.ClusterID, false)
 			if err != nil {
 				if len(p.ForceDeprovisionCommand) > 0 {
@@ -52,6 +54,8 @@ func (p Pool) gcCollect(ctx *generic.Context, componentSubName string,gcclusters
 			wg.Add(todeprovision-1)
 			for i := 0; i < todeprovision; i++ {
 				go func() {
+					gcclusters.Items[i].State = clusters.State_Cleanup
+					_ = gcclusters.Items[i].Save(ctx)
 					err := p.deprovision(ctx, gcclusters.Items[i].ClusterID, false)
 					if err != nil {
 						if len(p.ForceDeprovisionCommand) > 0 {
@@ -85,7 +89,7 @@ func (p Pool) gcByCondition(ctx *generic.Context) error  {
 	}
 	// gather clusterlist to delete
 	for _, item := range clusterlist.Items {
-		if item.State == clusters.State_Failed || item.State == clusters.State_Cleanup {
+		if item.State == clusters.State_Failed {
 			gcclusters.Items = append(gcclusters.Items, item)
 		} else if item.State == clusters.State_Used || item.State == clusters.State_Success {
 			//dead time, knows when the clusterlist is supposed to have died
@@ -143,7 +147,7 @@ func (p Pool) GC(ctx *generic.Context) error  {
 	ctx.Log.Info("Pool GC", "initiating GC of pool %s", p.Name)
 	ctx.Log.Info("Pool GC", "initiating cleanup of clusters that have met some conditions, pool %s", p.Name)
 	_ = p.gcByCondition(ctx)
-	ctx.Log.Info("Pool GC", "initiating cleanup of clusters that need to be removed due to config change, pool %s", p.Name)
+	ctx.Log.Info("Pool GC", "initiating cleanup of clusters that need to be removed due to expected size reduction change, pool %s", p.Name)
 	_ = p.gcByConfigChange(ctx)
 	return nil
 }
