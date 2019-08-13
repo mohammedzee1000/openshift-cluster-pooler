@@ -1,8 +1,7 @@
-package apierror
+package apiresponse
 
-type APIError struct {
-	Errcode  int `json:"errcode"`
-	Message   string `json:"message"`
+func NewNoError() *APIError {
+	return &APIError{0, ""}
 }
 
 func NewNotFoundError(msg string) *APIError {
