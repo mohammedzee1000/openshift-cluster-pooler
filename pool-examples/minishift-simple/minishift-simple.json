@@ -2,7 +2,7 @@
     "Name": "minishift-simple",
     "description": "minishift-simple",
     "size": 2,
-    "max_size": 2,
+    "max-size": 2,
     "unused-cluster-timeout": 1,
     "used-cluster-timeout": 1,
     "parallel-provisioning": 1,
