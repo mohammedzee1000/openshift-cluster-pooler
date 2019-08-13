@@ -28,7 +28,7 @@ func (p Pool) GetClusters(ctx *generic.Context) (*clusters.ClusterList, error)  
 		if err != nil {
 			return nil, err
 		}
-		clusterlist.Items = append(clusterlist.Items, cl)
+		clusterlist.Append(&cl)
 	}
 	return clusterlist, nil
 }

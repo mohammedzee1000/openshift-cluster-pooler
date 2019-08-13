@@ -18,14 +18,14 @@ func (p Pool) Reconcile(ctx *generic.Context) error {
 		return err
 	}
 	//Calculate current clusterlist count
-	for _, item := range clusterlist.Items {
-		if item.State == clusters.State_Provisioning || item.State == clusters.State_Success || item.State == clusters.State_Used {
+	clusterlist.List(func(c *clusters.Cluster) {
+		if c.State == clusters.State_Provisioning || c.State == clusters.State_Success || c.State == clusters.State_Used {
 			currentClusters = currentClusters + 1
-			if item.State == clusters.State_Used {
+			if c.State == clusters.State_Used {
 				activatedClusters = activatedClusters + 1
 			}
 		}
-	}
+	})
 	//Only if current clusterlist are less than expected
 	if currentClusters < p.Size {
 		ctx.Log.Info("Pool Reconcile", "available clusters do not match expected for pool %s", p.Name)

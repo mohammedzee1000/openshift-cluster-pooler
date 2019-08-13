@@ -42,7 +42,7 @@ func List(ctx *generic.Context) (*ClusterList, error)  {
 		if err != nil {
 			return nil, err
 		}
-		clusters.Items = append(clusters.Items, cl)
+		clusters.Append(&cl)
 	}
 	return clusters, nil
 }

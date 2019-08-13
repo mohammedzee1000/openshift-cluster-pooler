@@ -12,20 +12,20 @@ import (
 func (p Pool) gcCollect(ctx *generic.Context, componentSubName string,gcclusters *clusters.ClusterList) error  {
 	var err error
 	componentName := fmt.Sprintf("Pool GC - %s", componentSubName)
-	if len(gcclusters.Items) <= 0 {
+	if gcclusters.Len() <= 0 {
 		ctx.Log.Info(componentName, "no garbage in pool %s, skipping", p.Name)
 		return nil
 	}
 	// deleteInDB clusterlist as needed
 	// If no paralled deprovisioning, do it serially
 	if p.ParallelDeProvisioning <= 1 {
-		for _, item := range gcclusters.Items {
-			item.State = clusters.State_Cleanup
-			_ = item.Save(ctx)
-			err = p.deprovision(ctx, item.ClusterID, false)
+		gcclusters.List(func(c *clusters.Cluster) {
+			c.State = clusters.State_Cleanup
+			_ = c.Save(ctx)
+			err = p.deprovision(ctx, c.ClusterID, false)
 			if err != nil {
 				if len(p.ForceDeprovisionCommand) > 0 {
-					err = p.deprovision(ctx, item.ClusterID, true)
+					err = p.deprovision(ctx, c.ClusterID, true)
 					if err != nil {
 						ctx.Log.Error(componentName, err, "Failed to force deprovision cluster")
 					}
@@ -33,12 +33,12 @@ func (p Pool) gcCollect(ctx *generic.Context, componentSubName string,gcclusters
 					ctx.Log.Error(componentName, err, "Failed to deprovision cluster")
 				}
 			}
-		}
+		})
 	} else {
 		//Example paralleldeprovision = 3, total = 5
 		//first iter - todeprovision = 3, total = 2
 		//second iter - todeprovision = 3, total = -1; todeprovision = 3-1 = 2
-		total := len(gcclusters.Items)
+		total := gcclusters.Len()
 		for total > 0 {
 			//assume we need to deprovision, parallel deprovision no of times
 			todeprovision := p.ParallelDeProvisioning
@@ -54,12 +54,12 @@ func (p Pool) gcCollect(ctx *generic.Context, componentSubName string,gcclusters
 			wg.Add(todeprovision-1)
 			for i := 0; i < todeprovision; i++ {
 				go func(i int) {
-					gcclusters.Items[i].State = clusters.State_Cleanup
-					_ = gcclusters.Items[i].Save(ctx)
-					err := p.deprovision(ctx, gcclusters.Items[i].ClusterID, false)
+					gcclusters.ItemAt(i).State = clusters.State_Cleanup
+					_ = gcclusters.ItemAt(i).Save(ctx)
+					err := p.deprovision(ctx, gcclusters.ItemAt(i).ClusterID, false)
 					if err != nil {
 						if len(p.ForceDeprovisionCommand) > 0 {
-							err = p.deprovision(ctx, gcclusters.Items[i].ClusterID, true)
+							err = p.deprovision(ctx, gcclusters.ItemAt(i).ClusterID, true)
 							if err != nil {
 								chanerrors <- err
 							}
@@ -88,18 +88,30 @@ func (p Pool) gcByCondition(ctx *generic.Context) error  {
 		return err
 	}
 	// gather clusterlist to delete
-	for _, item := range clusterlist.Items {
-		if item.State == clusters.State_Failed {
-			gcclusters.Items = append(gcclusters.Items, item)
-		} else if item.State == clusters.State_Used || item.State == clusters.State_Success {
+	clusterlist.List(func(c *clusters.Cluster) {
+		if c.State == clusters.State_Failed {
+			gcclusters.Append(c)
+		} else if c.State == clusters.State_Used || c.State == clusters.State_Success {
 			//dead time, knows when the clusterlist is supposed to have died
-			dt := p.ExpiresOn(&item)
+			dt := p.ExpiresOn(c)
 			//if current time is after dead time, cleanup !!
 			if dt.Before(time.Now()) {
-				gcclusters.Items = append(gcclusters.Items, item)
+				gcclusters.Append(c)
 			}
 		}
-	}
+	})
+	clusterlist.List(func(c *clusters.Cluster) {
+		if c.State == clusters.State_Failed {
+			gcclusters.Append(c)
+		} else if c.State == clusters.State_Used || c.State == clusters.State_Success {
+			//dead time, knows when the clusterlist is supposed to have died
+			dt := p.ExpiresOn(c)
+			//if current time is after dead time, cleanup !!
+			if dt.Before(time.Now()) {
+				gcclusters.Append(c)
+			}
+		}
+	})
 	return p.gcCollect(ctx, "By Condition", gcclusters)
 }
 
@@ -111,8 +123,8 @@ func (p Pool) gcByConfigChange(ctx *generic.Context) error {
 	// find out how many clusters need to be removed
 	// len of success clusters and used clusters
 	successclusters := clusterlist.ClustersInStateIn(clusters.State_Success)
-	successclustercount := len(successclusters.Items)
-	usedclusterscount := len(clusterlist.ClustersInStateIn(clusters.State_Used).Items)
+	successclustercount := successclusters.Len()
+	usedclusterscount := clusterlist.ClustersInStateIn(clusters.State_Used).Len()
 	var toremove int
 	if p.MaxSize > p.Size && usedclusterscount >= p.Size - 1 {
 		toremove = successclustercount - p.MaxSize

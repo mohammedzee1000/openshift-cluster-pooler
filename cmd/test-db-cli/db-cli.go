@@ -91,13 +91,13 @@ func main()  {
 		if err != nil {
 			ctx.Log.Fatal("list-clusters", err, "cannot list clusters")
 		}
-		for _, item := range cl.Items{
-			data, err := json.Marshal(item)
+		cl.List(func(c *clusters.Cluster) {
+			data, err := json.Marshal(*c)
 			if err != nil {
 				ctx.Log.Error("list-clusters", err, "failed to unmarshal cluster info")
 			}
 			fmt.Println(string(data))
-		}
+		})
 		break
 	case "get-cluster-from-pool":
 		pn := os.Args[2]
