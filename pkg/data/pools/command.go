@@ -27,7 +27,7 @@ func runCommand(uuid string, command string) (string, error) {
 		if err != nil {
 			return "", err
 		}
-		return string(o), err
+		return strings.TrimRight(string(o), "\n"), err
 	}
 	return "", NewCommandMissingError()
 }

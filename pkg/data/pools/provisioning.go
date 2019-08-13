@@ -3,9 +3,8 @@ package pools
 import (
 	"fmt"
 	"github.com/google/uuid"
-	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/generic"
 	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/data/clusters"
-	"strings"
+	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/generic"
 	"time"
 )
 
@@ -57,12 +56,7 @@ func (p Pool) gatherInfoOnSuccess(c *clusters.Cluster) (error) {
 		}
 		return err
 	}
-	p.stripeol(c)
 	return nil
-}
-
-func (p Pool) stripeol(c *clusters.Cluster)  {
-	c.URL = strings.TrimRight(c.URL, "\n")
 }
 
 //provision provisions a clusters using provided command.
