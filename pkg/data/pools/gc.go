@@ -100,18 +100,6 @@ func (p Pool) gcByCondition(ctx *generic.Context) error  {
 			}
 		}
 	})
-	clusterlist.List(func(c *clusters.Cluster) {
-		if c.State == clusters.State_Failed {
-			gcclusters.Append(c)
-		} else if c.State == clusters.State_Used || c.State == clusters.State_Success {
-			//dead time, knows when the clusterlist is supposed to have died
-			dt := p.ExpiresOn(c)
-			//if current time is after dead time, cleanup !!
-			if dt.Before(time.Now()) {
-				gcclusters.Append(c)
-			}
-		}
-	})
 	return p.gcCollect(ctx, "By Condition", gcclusters)
 }
 
