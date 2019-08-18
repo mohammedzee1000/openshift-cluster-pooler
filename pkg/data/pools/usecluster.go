@@ -10,9 +10,9 @@ import (
 	"time"
 )
 
-//UseCluster activates a cluster, if it is available. This is the only direct db func
+//ActivateCluster activates a cluster, if it is available. This is the only direct db func
 //in pool as we need to ensure cluster activation is a transaction
-func (p Pool) UseCluster(ctx *generic.Context) (*clusters.Cluster, error)  {
+func (p Pool) ActivateCluster(ctx *generic.Context) (*clusters.Cluster, error)  {
 	var c clusters.Cluster
 	var found bool
 	db, err := ctx.NewBadgerConnection()
@@ -64,7 +64,7 @@ func (p Pool) UseCluster(ctx *generic.Context) (*clusters.Cluster, error)  {
 	})
 	// if not found return an error
 	if !found {
-		return nil, errors.New("could not get a cluster to activae")
+		return nil, errors.New("could not get a cluster to activate")
 	}
 	database.HandleError(ctx, err)
 	return &c, nil

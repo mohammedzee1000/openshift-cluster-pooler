@@ -105,7 +105,7 @@ func main()  {
 		if err != nil {
 			ctx.Log.Fatal("get-cluster-from-pool", err, "failed to get a cluster pool")
 		}
-		c, err := p.UseCluster(ctx)
+		c, err := p.ActivateCluster(ctx)
 		if err != nil{
 			ctx.Log.Fatal("get-cluster-from-pool", err, "failed to get a cluster")
 		}
