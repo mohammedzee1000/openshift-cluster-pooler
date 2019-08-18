@@ -12,7 +12,7 @@ func main()  {
 	router := mux.NewRouter()
 	router.HandleFunc("/pools/list", common.ListPoolNames).Methods("GET")
 	router.HandleFunc("/pool/{poolname}/activate-cluster", common.ActivateCluster).Methods("GET")
-	//TODO add route here
+	router.HandleFunc("/cluster/{clusterid}/describe", common.GetClusterInfo).Methods("GET")
 	srv := http.Server{
 		Addr:              ":20000",
 		Handler:           router,

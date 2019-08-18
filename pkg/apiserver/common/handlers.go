@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/gorilla/mux"
 	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/apiserver/apiresponse"
+	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/data/clusters"
 	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/data/pools"
 	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/generic"
 	"net/http"
@@ -32,6 +33,42 @@ func ListPoolNames(w http.ResponseWriter, r *http.Request)  {
 	}
 	d.Error = ""
 	d.Data = poolnamelist
+	_ = json.NewEncoder(w).Encode(d)
+}
+
+func GetClusterInfo(w http.ResponseWriter, r *http.Request)  {
+	w.Header().Set("Content-type", "application/json")
+	d := apiresponse.NewApiResponse("v1beta")
+	ctx, err := generic.NewContext("clientapiserver")
+	if err != nil {
+		d.Error = apiresponse.NewContextError(err)
+		d.Data = nil
+		_ = json.NewEncoder(w).Encode(d)
+		return
+	}
+	vars := mux.Vars(r)
+	if val, ok := vars["clusterid"]; ok {
+		found := false
+		cl, err := clusters.List(ctx)
+		if err != nil {
+			d.Error = apiresponse.NewFormattedErrorMsg(err, "unable to list clusters")
+			_ = json.NewEncoder(w).Encode(d)
+			return
+		}
+		for i:=0 ; i < cl.Len(); i++ {
+			if !found && cl.ItemAt(i).ClusterID == val {
+				found = true
+				d.Data = cl.ItemAt(i)
+				_ = json.NewEncoder(w).Encode(d)
+				return
+			}
+		}
+		if !found {
+			d.Error = apiresponse.NewFormattedErrorMsg(nil, "could not find cluster with uuid")
+		}
+	} else {
+		d.Error = apiresponse.NewMissingParameterError("clusterid")
+	}
 	_ = json.NewEncoder(w).Encode(d)
 }
 
