@@ -89,7 +89,7 @@ func (p Pool) gcByCondition(ctx *generic.Context) error  {
 	}
 	// gather clusterlist to delete
 	clusterlist.List(func(c *clusters.Cluster) {
-		if c.State == clusters.State_Failed {
+		if c.State == clusters.State_Failed || c.State == clusters.State_Returned {
 			gcclusters.Append(c)
 		} else if c.State == clusters.State_Used || c.State == clusters.State_Success {
 			//dead time, knows when the clusterlist is supposed to have died

@@ -1,4 +1,4 @@
-package apiresponse
+package types
 
 import (
 	"fmt"
@@ -9,7 +9,6 @@ type ErrorMessage string
 type APIResponse struct {
 	ApiVersion string `json:"api_version"`
 	Error ErrorMessage `json:"error"`
-	Data  interface{} `json:"data,omitempty"`
 }
 
 func NewApiResponse(version string) *APIResponse  {

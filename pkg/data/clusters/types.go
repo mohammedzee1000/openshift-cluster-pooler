@@ -1,6 +1,7 @@
 package clusters
 
 import (
+	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/generic"
 	"time"
 
 )
@@ -9,9 +10,10 @@ const (
 	State_Provisioning   = "Provisioning"
 	State_Failed         = "Failed"
 	State_Success        = "Success"
-	State_Used           = "Used"
+	State_Used           = "Activated"
 	State_DeProvisioning = "Deprovisioning"
 	State_Cleanup        = "Cleanup"
+	State_Returned       = "Returned"
 	Cluster_Prefix       = "Cluster"
 )
 
@@ -25,7 +27,7 @@ type Cluster struct {
 	CAFile 		string `json:"ca-file"`
 	CertFile    string `json:"cert-file"`
 	KeyFile 	string `json:"key-file"`
-	ExtraInfo	string `json:"extra-nfo"`
+	ExtraInfo	string `json:"extra-info"`
 	CreatedOn   time.Time `json:"created-on"`
 	ActivatedOn time.Time `json:"activated-on"`
 }
@@ -65,4 +67,9 @@ func NewClusterList() *ClusterList {
 
 func WrapClusterList(clusters []*Cluster) *ClusterList  {
 	return &ClusterList{items: clusters}
+}
+
+func (c *Cluster) Return(ctx *generic.Context) error  {
+	c.State = State_Returned
+	return c.Save(ctx)
 }
