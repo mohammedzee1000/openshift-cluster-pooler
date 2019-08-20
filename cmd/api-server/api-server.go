@@ -16,10 +16,10 @@ func main()  {
 	}
 	router := mux.NewRouter()
 	router.HandleFunc("/pools/list", serverhandlers.ListPoolNames).Methods("GET")
-	router.HandleFunc("/pool/{poolname}/activate", serverhandlers.ActivateCluster).Methods("GET")
+	router.HandleFunc("/pool/{poolname}/get-cluster", serverhandlers.ActivateCluster).Methods("GET")
 	router.HandleFunc("/pool/{poolname}/describe", serverhandlers.GetPoolShortDescription).Methods("GET")
 	router.HandleFunc("/cluster/{clusterid}/describe", serverhandlers.GetClusterInfo).Methods("GET")
-	router.HandleFunc("/cluster/{clusterid}/deactivate", serverhandlers.DeactivateCluster).Methods("GET")
+	router.HandleFunc("/cluster/{clusterid}/return", serverhandlers.DeactivateCluster).Methods("GET")
 	srv := http.Server{
 		Addr:              addr,
 		Handler:           router,

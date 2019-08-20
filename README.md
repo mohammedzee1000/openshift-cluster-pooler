@@ -16,13 +16,17 @@ $ git clone mohammedzee1000/openshift-cluster-pool && cd openshift-cluster-pool
 
 **Note:** You may need to setup requirements in go.mod appropriately before proceeding
 
+### Build the binaries
+
+Build all the nessasary binaries with 
+
+```bash
+$ make build
+# or
+# scripts/build.sh
+```
+
 ### Setup DB
-
-Build db-cli
-
-```
-go build cmd/test-db-cli/db-cli.go
-```
 
 Make a test DB directory
 ```
@@ -45,18 +49,9 @@ Copy scripts to /usr/bin/
 $ cp -avrf pool-examples/minishift-simple/usr/bin/* /usr/bin/
 ```
 
-### Run pool manager
+### Start pool manager
 
-Build pool manager
-
-```
-$ go build cmd/pool-manager/pool-manager.go
-```
-
-
-Start pool manager
-
-```
+```bash
 BADGER_DIR="`pwd`/test-badger" ./pool-manager
 ```
 
@@ -64,6 +59,46 @@ BADGER_DIR="`pwd`/test-badger" ./pool-manager
 
 As already stated `db-cli` is only for testing purposes. But you can use still use it.
 Just do `./db-cli help` to find other commands
+
+### Client API Server
+
+A basic client api server is provided that can be launched with
+
+```bash
+$ BADGER_DIR="`pwd`/test-badger" HOST_ON=":20000" ./api-server
+```
+
+#### Possible operations:
+
+##### List pool
+ 
+ ```bash
+$ curl http://localhost:20000/pools/list
+```
+
+##### Describe a pool
+
+```bash
+$ curl http://localhost:20000/pool/minishift-simple/describe
+```
+
+##### Activate cluster
+
+```bash
+$ curl http://localhost:20000/pool/minishift-simple/get-cluster
+```
+
+##### Describe Cluster
+
+```bash
+$ curl -k http://localhost:20000/cluster/{clusterid}/describe
+```
+
+##### Return used cluster early for cleanup
+
+```bash
+$ curl -k http://localhost:20000/cluster/{clusterid}/return
+```
 
 ## In the pipeline
  - Admin API Server + client to replace db-cli
