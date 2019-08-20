@@ -5,7 +5,7 @@ import (
 )
 
 type ClusterInfo struct {
-	Data    *clusters.Cluster
+	Data    *clusters.Cluster `json:"data"`
 	*APIResponse
 }
 

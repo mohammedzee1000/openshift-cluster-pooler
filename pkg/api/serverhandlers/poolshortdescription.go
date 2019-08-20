@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/gorilla/mux"
 	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/api/types"
+	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/data/clusters"
 	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/data/pools"
 	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/generic"
 	"net/http"
@@ -26,8 +27,18 @@ func GetPoolShortDescription(w http.ResponseWriter, r *http.Request) {
 			_ = json.NewEncoder(w).Encode(d)
 			return
 		}
-		p.GetClusters()
+		cl, err := p.GetClusters(ctx)
+		if err != nil {
+			d.Error = types.NewFormattedErrorMsg(err, "could not retrieve cluster list")
+		}
 		d.Description = p.Description
+		tot := cl.Len()
+		for i:=0; i<tot; i++ {
+			curr := cl.ItemAt(i)
+			if curr.State == clusters.State_Success {
+				d.CurrentCount = d.CurrentCount + 1
+			}
+		}
 	} else {
 		d.Error = types.NewMissingParameterError("poolname")
 	}

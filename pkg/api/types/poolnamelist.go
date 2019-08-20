@@ -1,7 +1,7 @@
 package types
 
 type PoolNameList struct {
-	Data   []string
+	Data   []string `json:"data"`
 	*APIResponse
 }
 

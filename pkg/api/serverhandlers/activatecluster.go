@@ -9,8 +9,6 @@ import (
 	"net/http"
 )
 
-
-
 func ActivateCluster(w http.ResponseWriter, r *http.Request)  {
 	w.Header().Set("Content-Type", "application/json")
 	d := types.NewClusterInfo("v1beta")
