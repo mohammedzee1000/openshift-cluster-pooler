@@ -9,7 +9,7 @@ import (
 	"net/http"
 )
 
-func ReturnCluster(w http.ResponseWriter, r *http.Request) {
+func DeactivateCluster(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-type", "application/json")
 	d := types.NewStringResponse("v1beta")
 	ctx, err := generic.NewContext("clientapiserver")
