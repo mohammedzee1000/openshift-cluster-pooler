@@ -2,6 +2,7 @@ package pools
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"os/exec"
 	"strings"
@@ -16,6 +17,12 @@ func IsCommandMissingError(err error) bool {
 		return true
 	}
 	return false
+}
+
+func PrintIfDebug(debug bool, title string, out string)  {
+	if debug {
+		fmt.Printf("%s : \n%s\n", title, out)
+	}
 }
 
 func runCommand(uuid string, command string) (string, error) {

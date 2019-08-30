@@ -65,13 +65,15 @@ func (p Pool) provision(ctx *generic.Context) error {
 	clusterid := uuid.New().String()
 	c := clusters.NewCluster(clusterid, p.Name)
 	_ = c.Save(ctx)
-	_, err := runCommand(clusterid, p.ProvisionCommand)
+	out, err := runCommand(clusterid, p.ProvisionCommand)
 	if err != nil {
 		c.State = clusters.State_Failed
 		_ = c.Save(ctx)
 		ctx.Log.Error("Pool provision", err, "failed provision of clusters of pool %s", p.Name)
+		PrintIfDebug(ctx.Debug, "provision command output", out)
 		return err
 	}
+	PrintIfDebug(ctx.Debug, "provision command output", out)
 	err = p.gatherInfoOnSuccess(c)
 	if err != nil {
 		c.State = clusters.State_Failed
@@ -99,14 +101,16 @@ func (p Pool) deprovision(ctx *generic.Context, clusterid string, force bool) er
 	}
 	c.State = clusters.State_DeProvisioning
 	_ = c.Save(ctx)
-	_, err = runCommand(clusterid, cmd)
+	out, err := runCommand(clusterid, cmd)
 	if err != nil {
 		ctx.Log.Error("Pool deprovision", err,"failed to deprovision cluster %s, pool %s", c.ClusterID, p.Name)
 		c.State = clusters.State_Failed
 		_ = c.Save(ctx)
+		PrintIfDebug(ctx.Debug, "deprovision command output", out)
 		return err
 	}
 	c.Delete(ctx)
+	PrintIfDebug(ctx.Debug, "deprovision command output", out)
 	ctx.Log.Info("Pool deprovision", "successfully deprovisioned clusters %s, pool %s", c.ClusterID, p.Name)
 	return nil
 }
