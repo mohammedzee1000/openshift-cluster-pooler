@@ -13,8 +13,8 @@
     "cluster-url-command": "minishift-simple-cluster-url.sh",
     "cluster-admin-user-command": "echo 'developer'",
     "cluster-admin-password-command": "echo 'developer'",
-    "cluster-ca-file-command": "cat $HOME/.minishift/profiles/$CLUSTER_UUID/certs/ca.pem",
-    "cluster-cert-file-command": "cat $HOME/.minishift/profiles/$CLUSTER_UUID/certs/cert.pem",
-    "cluster-key-file-command": "cat $HOME/.minishift/profiles/$CLUSTER_UUID/certs/key.pem",
+    "cluster-ca-file-path-string": "$HOME/.minishift/profiles/$CLUSTER_UUID/certs/ca.pem",
+    "cluster-cert-file-path-string": "$HOME/.minishift/profiles/$CLUSTER_UUID/certs/cert.pem",
+    "cluster-key-file-path-string": "cat $HOME/.minishift/profiles/$CLUSTER_UUID/certs/key.pem",
     "cluster-extra-info-command": "echo ''"
 }

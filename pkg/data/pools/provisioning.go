@@ -27,7 +27,7 @@ func (p Pool) gatherInfoOnSuccess(c *clusters.Cluster) (error) {
 	c.CAFile, err = p.getClusterCAFile(c.ClusterID)
 	if err != nil {
 		if IsCommandMissingError(err) {
-			c.CAFile = ""
+			c.CAFile = nil
 			return nil
 		}
 		return err
@@ -35,7 +35,7 @@ func (p Pool) gatherInfoOnSuccess(c *clusters.Cluster) (error) {
 	c.CertFile, err = p.getClusterCertFile(c.ClusterID)
 	if err != nil {
 		if IsCommandMissingError(err) {
-			c.CertFile = ""
+			c.CertFile = nil
 			return nil
 		}
 		return err
@@ -43,7 +43,7 @@ func (p Pool) gatherInfoOnSuccess(c *clusters.Cluster) (error) {
 	c.KeyFile, err = p.getClusterKeyFile(c.ClusterID)
 	if err != nil {
 		if IsCommandMissingError(err) {
-			c.KeyFile = ""
+			c.KeyFile = nil
 			return nil
 		}
 		return err
@@ -142,31 +142,19 @@ func (p Pool) getClusterAdminPassword(clusterid string) (string, error) {
 	return string(out), nil
 }
 
-//getClusterCAFile gets the clusters CA file for clusters using uuid and command
-func (p Pool) getClusterCAFile(clusterid string) (string, error) {
-	out, err := runCommand(clusterid, p.ClusterCAFileCommand)
-	if err != nil {
-		return "", err
-	}
-	return string(out), nil
+//getClusterCAFile gets the clusters CA file content for clusters using uuid and command
+func (p Pool) getClusterCAFile(clusterid string) ([]string, error) {
+	return getFileContent(clusterid, p.ClusterCAFilePathString)
 }
 
-//getClusterCertFile gets the cert file of clusters using uuid and command
-func (p Pool) getClusterCertFile(clusterid string) (string, error) {
-	out, err := runCommand(clusterid, p.ClusterCertFileCommand)
-	if err != nil {
-		return "", err
-	}
-	return string(out), nil
+//getClusterCertFile gets the cert file content of clusters using uuid and command
+func (p Pool) getClusterCertFile(clusterid string) ([]string, error) {
+	return getFileContent(clusterid, p.ClusterCertFilePathString)
 }
 
-//getClusterKeyFile gets key file of clusters using uuid and command
-func (p Pool) getClusterKeyFile(clusterid string) (string, error) {
-	out, err := runCommand(clusterid, p.ClusterKeyFileCommand)
-	if err != nil {
-		return "", err
-	}
-	return string(out), nil
+//getClusterKeyFile gets key file content of clusters using uuid and command
+func (p Pool) getClusterKeyFile(clusterid string) ([]string, error) {
+	return getFileContent(clusterid, p.ClusterKeyFilePathString)
 }
 
 //getClusterExtraInfo gets extra  custom info about clusters using uuid and command

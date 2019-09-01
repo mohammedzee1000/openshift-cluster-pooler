@@ -24,9 +24,9 @@ type Cluster struct {
 	URL  string        `json:"url"`
 	AdminUser   string `json:"admin-user"`
 	AdminPassword string `json:"admin-password"`
-	CAFile 		string `json:"ca-file"`
-	CertFile    string `json:"cert-file"`
-	KeyFile 	string `json:"key-file"`
+	CAFile 		[]string `json:"ca-file"`
+	CertFile    []string `json:"cert-file"`
+	KeyFile 	[]string `json:"key-file"`
 	ExtraInfo	string `json:"extra-info"`
 	CreatedOn   time.Time `json:"created-on"`
 	ActivatedOn time.Time `json:"activated-on"`

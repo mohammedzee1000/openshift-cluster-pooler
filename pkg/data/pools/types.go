@@ -21,9 +21,9 @@ type Pool struct {
 	ClusterURLCommand           string `json:"cluster-url-command"`
 	ClusterAdminUserCommand     string `json:"cluster-admin-user-command"`
 	ClusterAdminPasswordCommand string `json:"cluster-admin-password-command"`
-	ClusterCAFileCommand        string `json:"cluster-ca-file-command"`
-	ClusterCertFileCommand      string `json:"cluster-cert-file-command"`
-	ClusterKeyFileCommand       string `json:"cluster-key-file-command"`
+	ClusterCAFilePathString     string `json:"cluster-ca-file-path-string"`
+	ClusterCertFilePathString   string `json:"cluster-cert-file-path-string"`
+	ClusterKeyFilePathString    string `json:"cluster-key-file-path-string"`
 	ClusterExtraInfoCommand     string `json:"cluster-extra-info-command"`
 }
 

@@ -3,6 +3,7 @@ package pools
 import (
 	"errors"
 	"fmt"
+	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/util"
 	"os"
 	"os/exec"
 	"strings"
@@ -23,6 +24,22 @@ func PrintIfDebug(debug bool, title string, out string)  {
 	if debug {
 		fmt.Printf("%s : \n%s\n", title, out)
 	}
+}
+
+func getFileContent(clusterid string, path string) ([]string, error)  {
+	out, err := evalString(clusterid, path)
+	if err != nil {
+		return nil, err
+	}
+	return util.ReadFileLines(string(out))
+}
+
+func evalString(uuid string, str string) (string, error)  {
+	if len(str) <= 0 {
+		return "", nil
+	}
+	command := fmt.Sprintf("echo %s", str)
+	return runCommand(uuid, command)
 }
 
 func runCommand(uuid string, command string) (string, error) {
