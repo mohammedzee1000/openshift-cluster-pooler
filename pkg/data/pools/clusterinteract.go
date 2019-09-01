@@ -12,9 +12,9 @@ import (
 func (p Pool) ExpiresOn(c *clusters.Cluster) time.Time {
 	var t time.Time
 	if c.State == clusters.State_Success {
-		t = c.CreatedOn.Add(time.Duration(p.UnusedClusterTimeout) * time.Hour)
+		t = c.CreatedOn.Add(p.UnusedClusterTimeout.Duration)
 	} else if c.State == clusters.State_Used {
-		t = c.ActivatedOn.Add(time.Duration(p.UsedClusterTimeout) * time.Hour)
+		t = c.ActivatedOn.Add(time.Duration(p.UsedClusterTimeout.Duration) * time.Hour)
 	}
 	return t
 }

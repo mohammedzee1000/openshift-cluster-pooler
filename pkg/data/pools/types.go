@@ -1,5 +1,7 @@
 package pools
 
+import "github.com/mohammedzee1000/openshift-cluster-pool/pkg/duration"
+
 const (
 	Pool_Key  = "Pool"
 	Cleanup_Pool_Key = "Cleanup-Pool"
@@ -11,8 +13,8 @@ type Pool struct {
 	Description                 string `json:"description"`
 	Size                        int    `json:"size"`
 	MaxSize                     int    `json:"max-size"`
-	UnusedClusterTimeout        int    `json:"unused-cluster-timeout"`
-	UsedClusterTimeout          int    `json:"used-cluster-timeout"`
+	UnusedClusterTimeout        duration.Duration    `json:"unused-cluster-timeout"`
+	UsedClusterTimeout          duration.Duration    `json:"used-cluster-timeout"`
 	ParallelProvisioning        int    `json:"parallel-provisioning"`
 	ParallelDeProvisioning      int    `json:"parallel-de-provisioning"`
 	ProvisionCommand            string `json:"provision-command"`
