@@ -144,17 +144,17 @@ func (p Pool) getClusterAdminPassword(clusterid string) (string, error) {
 
 //getClusterCAFile gets the clusters CA file content for clusters using uuid and command
 func (p Pool) getClusterCAFile(clusterid string) ([]string, error) {
-	return getFileContent(clusterid, p.ClusterCAFilePathString)
+	return getFileContent(clusterid, p.ClusterCAFilePath)
 }
 
 //getClusterCertFile gets the cert file content of clusters using uuid and command
 func (p Pool) getClusterCertFile(clusterid string) ([]string, error) {
-	return getFileContent(clusterid, p.ClusterCertFilePathString)
+	return getFileContent(clusterid, p.ClusterCertFilePath)
 }
 
 //getClusterKeyFile gets key file content of clusters using uuid and command
 func (p Pool) getClusterKeyFile(clusterid string) ([]string, error) {
-	return getFileContent(clusterid, p.ClusterKeyFilePathString)
+	return getFileContent(clusterid, p.ClusterKeyFilePath)
 }
 
 //getClusterExtraInfo gets extra  custom info about clusters using uuid and command
