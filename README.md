@@ -76,10 +76,10 @@ $ BADGER_DIR="`pwd`/test-badger" HOST_ON=":20000" ./api-server
 $ curl http://localhost:20000/pools/list
 ```
 
-##### Describe a pool
+##### Basic describe a pool
 
 ```bash
-$ curl http://localhost:20000/pool/minishift-simple/describe
+$ curl http://localhost:20000/pool/minishift-simple/short-describe
 ```
 
 ##### Activate cluster
@@ -88,10 +88,10 @@ $ curl http://localhost:20000/pool/minishift-simple/describe
 $ curl http://localhost:20000/pool/minishift-simple/get-cluster
 ```
 
-##### Basic Cluster Information
+##### Get cluster information
 
 ```bash
-$ curl -k http://localhost:20000/cluster/{clusterid}/short-description
+$ curl -k http://localhost:20000/cluster/{clusterid}/describe
 ```
 
 ##### Return used cluster early for cleanup
