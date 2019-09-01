@@ -18,18 +18,18 @@ const (
 )
 
 type Cluster struct {
-	ClusterID   string `json:"cluster-id"`
-	PoolName    string `json:"pool-name"`
-	State       string `json:"state"`
-	URL  string        `json:"url"`
-	AdminUser   string `json:"admin-user"`
-	AdminPassword string `json:"admin-password"`
-	CAFile 		[]string `json:"ca-file"`
-	CertFile    []string `json:"cert-file"`
-	KeyFile 	[]string `json:"key-file"`
-	ExtraInfo	string `json:"extra-info"`
-	CreatedOn   time.Time `json:"created-on"`
-	ActivatedOn time.Time `json:"activated-on"`
+	ClusterID   string `json:"ClusterID"`
+	PoolName    string `json:"PoolName"`
+	State       string `json:"State"`
+	URL  string        `json:"URL"`
+	AdminUser   string `json:"AdminUser"`
+	AdminPassword string `json:"AdminPassword"`
+	CAFile 		[]string `json:"CAFile"`
+	CertFile    []string `json:"CertFile"`
+	KeyFile 	[]string `json:"KeyFile"`
+	ExtraInfo	string `json:"ExtraInfo"`
+	CreatedOn   time.Time `json:"CreatedOn"`
+	ActivatedOn time.Time `json:"ActivatedOn"`
 }
 
 func NewEmptyCluster() *Cluster {
