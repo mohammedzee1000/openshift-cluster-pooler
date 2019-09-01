@@ -3,19 +3,19 @@ package serverhandlers
 import (
 	"encoding/json"
 	"github.com/gorilla/mux"
+	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/api/servercontext"
 	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/api/types"
 	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/data/pools"
-	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/generic"
 	"net/http"
 )
 
 func ActivateCluster(w http.ResponseWriter, r *http.Request)  {
 	w.Header().Set("Content-Type", "application/json")
 	d := types.NewClusterInfo("v1beta")
-	ctx, err := generic.NewContext("clientapiserver")
+	ctx, err := servercontext.NewAPIServerContext()
 	if err != nil {
 		d.Error = types.NewContextError(err)
-		d.Data = nil
+		d.Cluster = nil
 		_ = json.NewEncoder(w).Encode(d)
 		return
 	}
@@ -31,7 +31,8 @@ func ActivateCluster(w http.ResponseWriter, r *http.Request)  {
 		if err != nil {
 			d.Error = types.NewFormattedErrorMsg(err, "could not access cluster information")
 		}
-		d.Data = c
+		d.Cluster = c
+		d.ExpiresOn = p.ExpiresOn(c)
 	} else {
 		d.Error = types.NewMissingParameterError("poolname")
 	}

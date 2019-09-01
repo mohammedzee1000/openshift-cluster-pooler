@@ -88,10 +88,10 @@ $ curl http://localhost:20000/pool/minishift-simple/describe
 $ curl http://localhost:20000/pool/minishift-simple/get-cluster
 ```
 
-##### Describe Cluster
+##### Basic Cluster Information
 
 ```bash
-$ curl -k http://localhost:20000/cluster/{clusterid}/describe
+$ curl -k http://localhost:20000/cluster/{clusterid}/short-description
 ```
 
 ##### Return used cluster early for cleanup

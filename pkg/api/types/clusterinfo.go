@@ -2,10 +2,12 @@ package types
 
 import (
 	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/data/clusters"
+	"time"
 )
 
 type ClusterInfo struct {
-	Data    *clusters.Cluster `json:"data"`
+	Cluster    *clusters.Cluster `json:"Cluster"`
+	ExpiresOn  time.Time  `json:"ExpiresOn"`
 	*APIResponse
 }
 
