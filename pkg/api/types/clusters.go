@@ -1,6 +1,6 @@
 package types
 
-import "github.com/mohammedzee1000/openshift-cluster-pool/pkg/data/clusters"
+import "github.com/mohammedzee1000/openshift-cluster-pool/pkg/clusters"
 
 type Clusters struct {
 	Clusters *clusters.ClusterList

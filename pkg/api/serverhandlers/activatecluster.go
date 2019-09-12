@@ -5,7 +5,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/api/servercontext"
 	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/api/types"
-	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/data/pools"
+	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/pools"
 	"net/http"
 )
 

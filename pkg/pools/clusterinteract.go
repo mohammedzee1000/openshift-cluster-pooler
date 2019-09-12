@@ -2,8 +2,8 @@ package pools
 
 import (
 	"encoding/json"
-	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/data/clusters"
-	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/data/database"
+	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/clusters"
+	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/database"
 	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/generic"
 	"time"
 )

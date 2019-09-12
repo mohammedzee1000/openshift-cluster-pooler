@@ -1,8 +1,8 @@
 package poolmanager
 
 import (
-	pools2 "github.com/mohammedzee1000/openshift-cluster-pool/pkg/data/pools"
 	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/generic"
+	pools2 "github.com/mohammedzee1000/openshift-cluster-pool/pkg/pools"
 	"log"
 	"time"
 )

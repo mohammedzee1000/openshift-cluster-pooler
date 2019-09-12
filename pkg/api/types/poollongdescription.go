@@ -1,10 +1,10 @@
 package types
 
-import "github.com/mohammedzee1000/openshift-cluster-pool/pkg/data/pools"
+import "github.com/mohammedzee1000/openshift-cluster-pool/pkg/pools"
 
 type PoolLongDescription struct {
-	CurrentCount  int  `json:"current_count"`
-	Pool *pools.Pool   `json:"pool"`
+	CurrentCount  int `json:"current_count"`
+	Pool *pools.Pool  `json:"pool"`
 	*APIResponse
 }
 

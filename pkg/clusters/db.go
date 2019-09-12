@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/database"
 	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/generic"
-	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/data/database"
 )
 
 func GetClusterPoolKey(poolname string) string {

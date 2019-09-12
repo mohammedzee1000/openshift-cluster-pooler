@@ -3,9 +3,9 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/data/clusters"
-	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/data/pools"
+	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/clusters"
 	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/generic"
+	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/pools"
 	"github.com/prometheus/common/log"
 	"io/ioutil"
 	"os"

@@ -3,7 +3,7 @@ package pools
 import (
 	"fmt"
 	"github.com/google/uuid"
-	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/data/clusters"
+	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/clusters"
 	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/generic"
 	"time"
 )
