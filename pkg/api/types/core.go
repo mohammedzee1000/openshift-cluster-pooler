@@ -29,3 +29,7 @@ func NewContextError(err error) ErrorMessage {
 func NewMissingParameterError(parameter string) ErrorMessage {
 	return NewFormattedErrorMsg(fmt.Errorf("require parameter"), "missing parameter %s", parameter)
 }
+
+func NewUnmarshallError(err error) ErrorMessage {
+	return NewFormattedErrorMsg(err, "failed to unmarshal expected json")
+}

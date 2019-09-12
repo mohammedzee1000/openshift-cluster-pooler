@@ -39,7 +39,7 @@ func (l *ClusterList) ClusterInList(c *Cluster) bool {
 
 
 //Extracts list of Items in a specific state
-func (l *ClusterList) ClustersInStateIn(state string) *ClusterList {
+func (l *ClusterList) ClustersInStateIn(state ClusterState) *ClusterList {
 	oc := NewClusterList()
 	for _, c := range l.items {
 		if c.State == state {

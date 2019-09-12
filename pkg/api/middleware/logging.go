@@ -1,4 +1,4 @@
-package serverhandlers
+package middleware
 
 import (
 	"github.com/mohammedzee1000/openshift-cluster-pool/pkg/api/servercontext"
