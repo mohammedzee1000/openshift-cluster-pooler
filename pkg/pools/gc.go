@@ -20,7 +20,7 @@ func (p Pool) gcCollect(ctx *generic.Context, componentSubName string,gcclusters
 	// If no paralled deprovisioning, do it serially
 	if p.ParallelDeProvisioning <= 1 {
 		gcclusters.List(func(c *clusters.Cluster) {
-			c.State = clusters.State_Cleanup
+			c.State = clusters.ClusterCleanup
 			_ = c.Save(ctx)
 			err = p.deprovision(ctx, c.ClusterID, false)
 			if err != nil {
@@ -54,7 +54,7 @@ func (p Pool) gcCollect(ctx *generic.Context, componentSubName string,gcclusters
 			wg.Add(todeprovision-1)
 			for i := 0; i < todeprovision; i++ {
 				go func(i int) {
-					gcclusters.ItemAt(i).State = clusters.State_Cleanup
+					gcclusters.ItemAt(i).State = clusters.ClusterCleanup
 					_ = gcclusters.ItemAt(i).Save(ctx)
 					err := p.deprovision(ctx, gcclusters.ItemAt(i).ClusterID, false)
 					if err != nil {
@@ -89,9 +89,9 @@ func (p Pool) gcByCondition(ctx *generic.Context) error  {
 	}
 	// gather clusterlist to delete
 	clusterlist.List(func(c *clusters.Cluster) {
-		if c.State == clusters.State_Failed || c.State == clusters.State_Returned {
+		if c.State == clusters.ClusterFailed || c.State == clusters.ClusterReturned {
 			gcclusters.Append(c)
-		} else if c.State == clusters.State_Used || c.State == clusters.State_Success {
+		} else if c.State == clusters.ClusterUsed || c.State == clusters.ClusterSuccess {
 			//dead time, knows when the clusterlist is supposed to have died
 			dt := p.ExpiresOn(c)
 			//if current time is after dead time, cleanup !!
@@ -110,9 +110,9 @@ func (p Pool) gcByConfigChange(ctx *generic.Context) error {
 	}
 	// find out how many clusters need to be removed
 	// len of success clusters and used clusters
-	successclusters := clusterlist.ClustersInStateIn(clusters.State_Success)
+	successclusters := clusterlist.ClustersInStateIn(clusters.ClusterSuccess)
 	successclustercount := successclusters.Len()
-	usedclusterscount := clusterlist.ClustersInStateIn(clusters.State_Used).Len()
+	usedclusterscount := clusterlist.ClustersInStateIn(clusters.ClusterUsed).Len()
 	var toremove int
 	if p.MaxSize > p.Size && usedclusterscount >= p.Size - 1 {
 		toremove = successclustercount - p.MaxSize

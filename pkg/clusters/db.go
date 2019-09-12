@@ -9,11 +9,11 @@ import (
 )
 
 func GetClusterPoolKey(poolname string) string {
-	return fmt.Sprintf("%s-%s", Cluster_Prefix, poolname)
+	return fmt.Sprintf("%s-%s", ClusterPrefix, poolname)
 }
 
 func GetClusterKey(clusterid string, poolname string) string {
-	return fmt.Sprintf("%s-%s-%s", Cluster_Prefix, poolname, clusterid)
+	return fmt.Sprintf("%s-%s-%s", ClusterPrefix, poolname, clusterid)
 }
 
 //save saves Items information in database
@@ -35,7 +35,7 @@ func (c Cluster) Delete(ctx *generic.Context)  {
 func List(ctx *generic.Context) (*ClusterList, error)  {
 	clusters := NewClusterList()
 	var err error
-	d := database.GetMultipleWithPrefixFromKVDB(ctx, Cluster_Prefix)
+	d := database.GetMultipleWithPrefixFromKVDB(ctx, ClusterPrefix)
 	for _, item := range d {
 		var cl Cluster
 		err = json.Unmarshal([]byte(item), &cl)

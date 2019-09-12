@@ -35,7 +35,7 @@ func GetPoolLongDescription(w http.ResponseWriter, r *http.Request) {
 		tot := cl.Len()
 		for i:=0; i<tot; i++ {
 			curr := cl.ItemAt(i)
-			if curr.State == clusters.State_Success {
+			if curr.State == clusters.ClusterSuccess {
 				d.CurrentCount = d.CurrentCount + 1
 			}
 		}

@@ -6,21 +6,12 @@ import (
 
 )
 
-const (
-	State_Provisioning   = "Provisioning"
-	State_Failed         = "Failed"
-	State_Success        = "Success"
-	State_Used           = "Activated"
-	State_DeProvisioning = "Deprovisioning"
-	State_Cleanup        = "Cleanup"
-	State_Returned       = "Returned"
-	Cluster_Prefix       = "Cluster"
-)
+const ClusterPrefix = "Cluster"
 
 type Cluster struct {
 	ClusterID   string `json:"ClusterID"`
 	PoolName    string `json:"PoolName"`
-	State       string `json:"State"`
+	State       ClusterState `json:"State"`
 	URL  string        `json:"URL"`
 	AdminUser   string `json:"AdminUser"`
 	AdminPassword string `json:"AdminPassword"`
@@ -40,7 +31,7 @@ func NewCluster(clusterid string, poolName string) *Cluster {
 	c := NewEmptyCluster()
 	c.ClusterID = clusterid
 	c.PoolName = poolName
-	c.State = State_Provisioning
+	c.State = ClusterProvisioning
 	return c
 }
 
@@ -70,6 +61,6 @@ func WrapClusterList(clusters []*Cluster) *ClusterList  {
 }
 
 func (c *Cluster) Return(ctx *generic.Context) error  {
-	c.State = State_Returned
+	c.State = ClusterReturned
 	return c.Save(ctx)
 }

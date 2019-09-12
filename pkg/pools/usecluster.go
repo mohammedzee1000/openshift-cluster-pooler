@@ -38,10 +38,10 @@ func (p Pool) ActivateCluster(ctx *generic.Context) (*clusters.Cluster, error)  
 					return err
 				}
 				// if one of the clusters we are iterating can be activated, activate it and found is true
-				if c.State == clusters.State_Success {
+				if c.State == clusters.ClusterSuccess {
 					if time.Now().Add(3 * time.Minute).Before(p.ExpiresOn(&c)) {
 						found = true
-						c.State = clusters.State_Used
+						c.State = clusters.ClusterUsed
 						c.ActivatedOn = time.Now()
 						data, err := json.Marshal(&c)
 						if err != nil{

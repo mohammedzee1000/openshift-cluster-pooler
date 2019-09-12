@@ -9,11 +9,11 @@ import (
 )
 
 func GetPoolKey(name string) string {
-	return fmt.Sprintf("%s-%s", Pool_Key, name)
+	return fmt.Sprintf("%s-%s", PoolKey, name)
 }
 
 func GetCleanupPoolKey(name string) string {
-	return fmt.Sprintf("%s-%s", Cleanup_Pool_Key, name)
+	return fmt.Sprintf("%s-%s", CleanupPoolKey, name)
 }
 
 //SaveInDB Saves the pool into database
@@ -61,9 +61,9 @@ func List(ctx *generic.Context, removal bool) ([]Pool, error)  {
 	var pools []Pool
 	var key string
 	if removal {
-		key = Cleanup_Pool_Key
+		key = CleanupPoolKey
 	} else {
-		key = Pool_Key
+		key = PoolKey
 	}
 	var err error
 	d := database.GetMultipleWithPrefixFromKVDB(ctx, key)

@@ -19,9 +19,9 @@ func (p Pool) Reconcile(ctx *generic.Context) error {
 	}
 	//Calculate current clusterlist count
 	clusterlist.List(func(c *clusters.Cluster) {
-		if c.State == clusters.State_Provisioning || c.State == clusters.State_Success || c.State == clusters.State_Used {
+		if c.State == clusters.ClusterProvisioning || c.State == clusters.ClusterSuccess || c.State == clusters.ClusterUsed {
 			currentClusters = currentClusters + 1
-			if c.State == clusters.State_Used {
+			if c.State == clusters.ClusterUsed {
 				activatedClusters = activatedClusters + 1
 			}
 		}

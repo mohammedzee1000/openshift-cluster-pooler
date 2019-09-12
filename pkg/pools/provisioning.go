@@ -10,7 +10,7 @@ import (
 
 func (p Pool) gatherInfoOnSuccess(c *clusters.Cluster) (error) {
 	var err error
-	c.State = clusters.State_Success
+	c.State = clusters.ClusterSuccess
 	c.CreatedOn = time.Now()
 	c.URL, err = p.getClusterURL(c.ClusterID)
 	if err != nil {
@@ -67,7 +67,7 @@ func (p Pool) provision(ctx *generic.Context) error {
 	_ = c.Save(ctx)
 	out, err := runCommand(clusterid, p.ProvisionCommand)
 	if err != nil {
-		c.State = clusters.State_Failed
+		c.State = clusters.ClusterFailed
 		_ = c.Save(ctx)
 		ctx.Log.Error("Pool provision", err, "failed provision of clusters of pool %s", p.Name)
 		PrintIfDebug(ctx.Debug, "provision command output", out)
@@ -76,7 +76,7 @@ func (p Pool) provision(ctx *generic.Context) error {
 	PrintIfDebug(ctx.Debug, "provision command output", out)
 	err = p.gatherInfoOnSuccess(c)
 	if err != nil {
-		c.State = clusters.State_Failed
+		c.State = clusters.ClusterFailed
 		_ = c.Save(ctx)
 		ctx.Log.Error("Pool provision", err,"failed to provision cluster %s, pool %s", c.ClusterID, p.Name)
 		return err

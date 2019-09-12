@@ -3,8 +3,8 @@ package pools
 import "github.com/mohammedzee1000/openshift-cluster-pool/pkg/duration"
 
 const (
-	Pool_Key  = "Pool"
-	Cleanup_Pool_Key = "Cleanup-Pool"
+	PoolKey        = "Pool"
+	CleanupPoolKey = "Cleanup-Pool"
 )
 
 //Pool repersents generic of a pool

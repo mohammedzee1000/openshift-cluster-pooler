@@ -18,12 +18,12 @@ func (p Pool) deprovision(ctx *generic.Context, clusterid string, force bool) er
 	if err != nil {
 		return err
 	}
-	c.State = clusters.State_DeProvisioning
+	c.State = clusters.ClusterDeProvisioning
 	_ = c.Save(ctx)
 	out, err := runCommand(clusterid, cmd)
 	if err != nil {
 		ctx.Log.Error("Pool deprovision", err,"failed to deprovision cluster %s, pool %s", c.ClusterID, p.Name)
-		c.State = clusters.State_Failed
+		c.State = clusters.ClusterFailed
 		_ = c.Save(ctx)
 		PrintIfDebug(ctx.Debug, "deprovision command output", out)
 		return err

@@ -11,9 +11,9 @@ import (
 //Gets when a cluster will expire in conjunction with a pool config
 func (p Pool) ExpiresOn(c *clusters.Cluster) time.Time {
 	var t time.Time
-	if c.State == clusters.State_Success {
+	if c.State == clusters.ClusterSuccess {
 		t = c.CreatedOn.Add(p.UnusedClusterTimeout.Duration)
-	} else if c.State == clusters.State_Used {
+	} else if c.State == clusters.ClusterUsed {
 		t = c.ActivatedOn.Add(time.Duration(p.UsedClusterTimeout.Duration) * time.Hour)
 	}
 	return t
