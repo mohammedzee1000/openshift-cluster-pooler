@@ -7,7 +7,7 @@
     "UsedClusterTimeout": "1h",
     "ParallelProvisioning": 1,
     "ParallelDeProvisioning": 1,
-    "Provision-command": "minishift-simple-provision.sh",
+    "ProvisionCommand": "minishift-simple-provision.sh",
     "DeProvisionCommand": "minishift-simple-deprovision.sh",
     "ForceDeProvisionCommand": "minishift-simple-deprovision.sh",
     "ClusterUrlCommand": "minishift-simple-cluster-url.sh",
