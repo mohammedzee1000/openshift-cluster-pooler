@@ -266,7 +266,7 @@ $ curl http://localhost:20000/v1beta/pool/minishift-simple/get-cluster | jq
     "CreatedOn": "2019-11-22T13:08:11.193430502+05:30",
     "ActivatedOn": "2019-11-22T13:12:20.034214837+05:30"
   },
-  "ExpiresOn": "2024-06-07T14:32:16.322223029+05:30", //non output note, this display logic needs to be fixed, but it should work as expected
+  "ExpiresOn": "2019-11-22T13:12:20.034214837+06:30",
   "api_version": "v1beta",
   "error": ""
 }
@@ -356,7 +356,7 @@ $ curl -k http://localhost:20000/v1beta/cluster/0507ab26-864b-42e5-ad01-ea8a0c69
     "CreatedOn": "2019-11-22T13:08:11.193430502+05:30",
     "ActivatedOn": "2019-11-22T13:12:20.034214837+05:30"
   },
-  "ExpiresOn": "2024-06-07T14:32:16.322223029+05:30",
+  "ExpiresOn": "2019-11-22T13:12:20.034214837+06:30",
   "api_version": "v1beta",
   "error": ""
 }
