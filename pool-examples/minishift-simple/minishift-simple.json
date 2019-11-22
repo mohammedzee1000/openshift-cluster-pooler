@@ -15,6 +15,6 @@
     "ClusterAdminPasswordCommand": "echo 'developer'",
     "ClusterCAFilePath": "$HOME/.minishift/profiles/$CLUSTER_UUID/certs/ca.pem",
     "ClusterCertFilePath": "$HOME/.minishift/profiles/$CLUSTER_UUID/certs/cert.pem",
-    "ClusterKeyFilePath": "cat $HOME/.minishift/profiles/$CLUSTER_UUID/certs/key.pem",
+    "ClusterKeyFilePath": "$HOME/.minishift/profiles/$CLUSTER_UUID/certs/key.pem",
     "ClusterExtraInfoCommand": "echo ''"
 }
